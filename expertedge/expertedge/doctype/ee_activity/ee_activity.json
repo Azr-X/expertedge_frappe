@@ -1,0 +1,70 @@
+{
+ "actions": [],
+ "creation": "2026-05-29 20:19:57.041793",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "istable": 1,
+ "field_order": [
+  "activity_on",
+  "activity_type",
+  "user",
+  "column_break_1",
+  "summary",
+  "outcome",
+  "follow_up_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "activity_on",
+   "fieldtype": "Datetime",
+   "label": "Date/Time",
+   "default": "Now",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "activity_type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Email\nWhatsApp\nNote\nMeeting\nPayment\nSystem",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "Logged By",
+   "options": "User",
+   "default": "__user"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Small Text",
+   "label": "Summary",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "outcome",
+   "fieldtype": "Data",
+   "label": "Outcome"
+  },
+  {
+   "fieldname": "follow_up_on",
+   "fieldtype": "Datetime",
+   "label": "Follow-up On"
+  }
+ ],
+ "links": [],
+ "modified": "2026-05-29 20:19:57.041793",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "EE Activity",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

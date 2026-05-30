@@ -1,0 +1,250 @@
+{
+ "actions": [],
+ "creation": "2026-05-29 20:19:57.041793",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "issingle": 1,
+ "field_order": [
+  "section_guide",
+  "app_guide",
+  "section_defaults",
+  "default_program",
+  "default_batch",
+  "default_company",
+  "column_break_defaults",
+  "billing_currency",
+  "deposit_account",
+  "default_income_account",
+  "service_item",
+  "section_nomod",
+  "nomod_api_base_url",
+  "nomod_api_key",
+  "column_break_nomod",
+  "nomod_service_fee_percent",
+  "section_email_templates",
+  "brochure_email_template",
+  "doc_request_email_template",
+  "pre_approval_email_template",
+  "column_break_email",
+  "payment_receipt_email_template",
+  "balance_payment_email_template",
+  "welcome_email_template",
+  "section_brochure",
+  "default_brochure",
+  "section_sla",
+  "first_contact_sla_minutes",
+  "doc_turnaround_sla_hours",
+  "column_break_sla",
+  "post_counselling_payment_sla_hours",
+  "full_payment_sla_days"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_guide",
+   "fieldtype": "Section Break",
+   "label": "User Guide",
+   "collapsible": 1,
+   "collapsible_depends_on": "eval:!doc.__islocal"
+  },
+  {
+   "fieldname": "app_guide",
+   "fieldtype": "HTML",
+   "label": "App Guide",
+   "options": "<div class=\"ee-guide\">\n<style>\n.ee-guide { font-size: 13.5px; line-height: 1.7; color: var(--text-color); }\n.ee-guide h2 { font-size: 18px; font-weight: 700; margin: 20px 0 8px; color: var(--heading-color); border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }\n.ee-guide h3 { font-size: 15px; font-weight: 600; margin: 14px 0 6px; color: var(--heading-color); }\n.ee-guide ol, .ee-guide ul { padding-left: 20px; margin: 6px 0; }\n.ee-guide li { margin-bottom: 4px; }\n.ee-guide code { background: var(--control-bg); padding: 1px 5px; border-radius: 3px; font-size: 12.5px; }\n.ee-guide .ee-role-badge { display: inline-block; background: var(--primary); color: #fff; padding: 1px 8px; border-radius: 10px; font-size: 11px; margin-right: 4px; }\n.ee-guide .ee-tip { background: var(--yellow-100, #fef9c3); border-left: 3px solid var(--yellow-500); padding: 8px 12px; margin: 8px 0; border-radius: 4px; }\n.ee-guide table { width: 100%; border-collapse: collapse; margin: 8px 0; }\n.ee-guide th, .ee-guide td { border: 1px solid var(--border-color); padding: 6px 10px; text-align: left; font-size: 13px; }\n.ee-guide th { background: var(--control-bg); font-weight: 600; }\n</style>\n\n<h2>ExpertEdge App \u2014 User Guide</h2>\n<p>ExpertEdge manages the full student lifecycle for the <strong>CMA Australia &amp; New Zealand</strong> program: from lead intake through qualification, counselling, payment collection, CMA registration, and enrollment.</p>\n\n<h2>1. How the Flow Works</h2>\n<ol>\n<li><strong>Lead arrives</strong> \u2014 via web form, ad webhook, or manual entry \u2192 creates an <code>EE Lead</code></li>\n<li><strong>Telecaller contacts</strong> \u2014 logs calls in the Call Log table, sends brochure, requests documents</li>\n<li><strong>Documents verified</strong> \u2014 counsellor verifies uploaded documents</li>\n<li><strong>Counselling session</strong> \u2014 counsellor creates an <code>EE Counselling Session</code>, sets outcome</li>\n<li><strong>Confirmed</strong> \u2014 if outcome is \u201cFit \u2013 Confirmed\u201d, lead status auto-moves to Confirmed</li>\n<li><strong>Convert to Student</strong> \u2014 click the button on a Confirmed lead \u2192 creates an <code>EE Student</code> with all data copied</li>\n<li><strong>Pre-Approval Payment</strong> \u2014 generate a payment link (AED 200), mark paid when received</li>\n<li><strong>CMA Registration</strong> \u2014 register student with CMA ANZ, mark as registered</li>\n<li><strong>Balance Payment</strong> \u2014 generate balance link, mark paid</li>\n<li><strong>Enrollment &amp; Materials</strong> \u2014 mark enrolled, issue materials, send welcome email</li>\n</ol>\n\n<h2>2. Roles &amp; What Each Role Can Do</h2>\n<table>\n<tr><th>Role</th><th>Access</th></tr>\n<tr><td><span class='ee-role-badge'>EE Telecaller</span></td><td>Create &amp; manage Leads. Log calls. Send brochure &amp; doc request emails. Read-only on Students &amp; Sessions.</td></tr>\n<tr><td><span class='ee-role-badge'>EE Academic Counsellor</span></td><td>Verify documents on Leads. Create &amp; manage Counselling Sessions. Edit Student CMA section &amp; batch. Read billing (can\u2019t edit).</td></tr>\n<tr><td><span class='ee-role-badge'>EE Finance</span></td><td>Edit Student billing fields. Create &amp; manage Payment Links. Mark payments as paid. Read Leads.</td></tr>\n<tr><td><span class='ee-role-badge'>EE Manager</span></td><td>Full access to everything. Manage settings, programs, batches, roles.</td></tr>\n</table>\n\n<h2>3. Key DocTypes</h2>\n<table>\n<tr><th>DocType</th><th>Purpose</th><th>Where to Find</th></tr>\n<tr><td><strong>EE Program</strong></td><td>The qualification (e.g. CMA ANZ). Defines fee, currency, discount.</td><td>Setup card in workspace</td></tr>\n<tr><td><strong>EE Batch</strong></td><td>A scheduled cohort (country, venue, dates, capacity). Students enroll into a Batch.</td><td>Setup card</td></tr>\n<tr><td><strong>EE Lead</strong></td><td>Prospective candidate. High-volume \u2014 only ~1% convert. Lightweight by design.</td><td>Lead Management card</td></tr>\n<tr><td><strong>EE Counselling Session</strong></td><td>Records a counselling call/meeting and its outcome.</td><td>Lead Management card</td></tr>\n<tr><td><strong>EE Student</strong></td><td>Converted candidate. Billing, CMA registration, enrollment all live here.</td><td>Student Management card</td></tr>\n<tr><td><strong>EE Nomod Payment Link</strong></td><td>Payment link (stub for now). Tracks amount, status, and creates Payment Entry on payment.</td><td>Student Management card</td></tr>\n<tr><td><strong>EE Lead Source</strong></td><td>Master list of where leads come from (Instagram, Facebook, etc.)</td><td>Setup card</td></tr>\n<tr><td><strong>EE Document Type</strong></td><td>Master list of required documents (Resume, Degree, Transcript, etc.)</td><td>Setup card</td></tr>\n</table>\n\n<h2>4. Step-by-Step: Processing a Lead</h2>\n<h3>4a. New Lead</h3>\n<ul>\n<li>Lead auto-created from web form / webhook, or manually via <code>New Lead</code> shortcut</li>\n<li>Status starts at <strong>New</strong></li>\n<li>A ToDo is created for the assigned telecaller with SLA timer</li>\n<li>Mandatory document rows (Resume, Degree, Transcript) are pre-seeded</li>\n</ul>\n\n<h3>4b. Contact &amp; Qualify</h3>\n<ul>\n<li>Add rows to the <strong>Call Log</strong> table for each call attempt</li>\n<li>First call auto-stamps <code>first_contacted_on</code> and moves status to <strong>Contacted</strong></li>\n<li>Click <strong>Actions \u2192 Send Brochure</strong> to email the brochure \u2192 status moves to <strong>Brochure Sent</strong></li>\n<li>Click <strong>Actions \u2192 Request Documents</strong> \u2192 status moves to <strong>Docs Requested</strong></li>\n</ul>\n\n<h3>4c. Verify Documents</h3>\n<ul>\n<li>As documents arrive, tick <strong>Received</strong> and upload the file in each document row</li>\n<li>Counsellor ticks <strong>Verified</strong> on each row</li>\n<li>Click <strong>Actions \u2192 Mark Documents Verified</strong> \u2192 all rows must be received+verified \u2192 status moves to <strong>Docs Verified</strong></li>\n</ul>\n\n<h3>4d. Counselling</h3>\n<ul>\n<li>Create a new <code>EE Counselling Session</code> linked to the lead</li>\n<li>After the session, set the <strong>Outcome</strong> field</li>\n<li>If outcome = <strong>Fit \u2013 Confirmed</strong>: lead auto-moves to <strong>Confirmed</strong> and a ToDo is created to convert</li>\n</ul>\n\n<h3>4e. Convert to Student</h3>\n<ul>\n<li>On a Confirmed lead, click the <strong>Convert to Student</strong> button (blue primary button)</li>\n<li>Creates an <code>EE Student</code> record with all data, documents, call log, and activity log copied</li>\n<li>Lead status \u2192 <strong>Converted</strong> (locked, cannot be converted again)</li>\n</ul>\n\n<h2>5. Step-by-Step: Processing a Student</h2>\n<h3>5a. Pre-Approval Payment (AED 200)</h3>\n<ul>\n<li>Click <strong>Billing \u2192 Generate Pre-Approval Link</strong></li>\n<li>This auto-creates the Customer + Sales Invoice if not done yet</li>\n<li>Share the payment link with the student</li>\n<li>When paid, open the Payment Link and click <strong>Actions \u2192 Mark as Paid</strong></li>\n<li>A Payment Entry is auto-created and student status moves to <strong>Pre-Approval Paid</strong></li>\n</ul>\n\n<h3>5b. CMA Registration</h3>\n<ul>\n<li>Register the student on the CMA ANZ portal</li>\n<li>Enter the <code>CMA Candidate ID</code></li>\n<li>Click <strong>Actions \u2192 Mark CMA Registered</strong> \u2192 status moves to <strong>CMA Registered</strong></li>\n</ul>\n\n<h3>5c. Balance Payment</h3>\n<ul>\n<li>Click <strong>Billing \u2192 Generate Balance Link</strong> \u2192 creates a link for the outstanding amount</li>\n<li>Tick <strong>Apply Lump-sum Discount</strong> before generating if student pays in full (saves 5%)</li>\n<li>Mark as Paid when received \u2192 student auto-moves to <strong>Fully Paid</strong> when outstanding = 0</li>\n</ul>\n\n<h3>5d. Enrollment &amp; Materials</h3>\n<ul>\n<li>Manager marks status as <strong>Enrolled</strong></li>\n<li>Click <strong>Actions \u2192 Issue Materials</strong> \u2192 status moves to <strong>Materials Issued</strong></li>\n<li>Click <strong>Email \u2192 Send Welcome Email</strong> with venue, timing, and Day-1 checklist</li>\n</ul>\n\n<h2>6. Emails</h2>\n<p>Six email templates are pre-configured. Each is triggered by a button:</p>\n<table>\n<tr><th>Button</th><th>Template</th><th>When to Use</th></tr>\n<tr><td>Send Brochure (Lead)</td><td>EE - Brochure &amp; Introduction</td><td>After first contact</td></tr>\n<tr><td>Request Documents (Lead)</td><td>EE - Document Request</td><td>After brochure sent</td></tr>\n<tr><td>Send Pre-Approval Email (Student)</td><td>EE - Pre-Approval Payment</td><td>After conversion, with payment link</td></tr>\n<tr><td>Send Receipt (Student)</td><td>EE - Payment Receipt</td><td>After any payment received</td></tr>\n<tr><td>Send Balance Email (Student)</td><td>EE - Balance Payment</td><td>After CMA registration</td></tr>\n<tr><td>Send Welcome Email (Student)</td><td>EE - Welcome &amp; Programme Details</td><td>After enrollment</td></tr>\n</table>\n<div class='ee-tip'><strong>Tip:</strong> You can edit the email template content at <code>/app/email-template</code>. Templates use <code>{{ doc.field }}</code> Jinja syntax to pull data from the Lead/Student record.</div>\n\n<h2>7. Reports</h2>\n<table>\n<tr><th>Report</th><th>What It Shows</th></tr>\n<tr><td>Conversion Funnel</td><td>Count per lead status + overall conversion rate</td></tr>\n<tr><td>Telecaller Performance</td><td>Calls made, connection rate, leads handled, SLA compliance, conversions per telecaller</td></tr>\n<tr><td>Call Activity</td><td>Raw call log \u2014 every call across leads &amp; students, filterable by date and result</td></tr>\n<tr><td>Counsellor Performance</td><td>Sessions done, Fit-Confirmed %, resulting enrollments per counsellor</td></tr>\n<tr><td>Payment Collection</td><td>Per student: net fee, paid, outstanding, days since start</td></tr>\n</table>\n\n<h2>8. Settings (This Page)</h2>\n<ul>\n<li><strong>Defaults</strong> \u2014 Company, program, batch, billing currency, accounts, service item</li>\n<li><strong>Nomod</strong> \u2014 Payment gateway config (leave blank for now \u2014 stub mode)</li>\n<li><strong>Email Templates</strong> \u2014 Link each button to its email template</li>\n<li><strong>Brochure</strong> \u2014 Upload the PDF brochure to attach with the brochure email</li>\n<li><strong>SLA Timers</strong> \u2014 Hourly checks create ToDos when deadlines are breached</li>\n</ul>\n\n<h2>9. Lead Intake Channels</h2>\n<ul>\n<li><strong>Web Form</strong> \u2014 Public form at <code>/program-enquiry</code>. Share this URL on your website.</li>\n<li><strong>Ad Webhook</strong> \u2014 Point Meta/LinkedIn lead-ad webhooks to <code>/api/method/expertedge.api.lead_webhook.webhook</code></li>\n<li><strong>Manual / Bulk</strong> \u2014 Use Data Import with the sample CSV format in the app</li>\n</ul>\n<div class='ee-tip'><strong>De-duplication:</strong> If a lead with the same email or mobile already exists (and isn\u2019t Lost/Converted), the system adds a note to the existing lead instead of creating a duplicate.</div>\n\n<h2>10. SLA Monitoring</h2>\n<p>The system checks every hour and creates ToDos for:</p>\n<ul>\n<li>Leads not contacted within <strong>{first_contact_sla_minutes}</strong> minutes</li>\n<li>Documents not received within <strong>{doc_turnaround_sla_hours}</strong> hours of request</li>\n<li>Pre-approval payment not received within <strong>{post_counselling_payment_sla_hours}</strong> hours</li>\n<li>Balance payment not received within <strong>{full_payment_sla_days}</strong> days</li>\n</ul>\n\n<h2>11. Programs &amp; Batches</h2>\n<ul>\n<li><strong>EE Program</strong> = the qualification (CMA ANZ). Defines the canonical fee (AED 3,500), discount %, and pre-approval amount.</li>\n<li><strong>EE Batch</strong> = a scheduled cohort for a specific country/city. Has venue, dates, timing, capacity. Can override the program fee if needed.</li>\n<li>Students are enrolled into a <strong>Batch</strong>. The batch\u2019s venue/timing feeds the welcome email.</li>\n</ul>\n\n<h2>12. Quick Reference: Status Flow</h2>\n<h3>Lead Statuses</h3>\n<p>New \u2192 Contacted \u2192 Brochure Sent \u2192 Docs Requested \u2192 Docs Received \u2192 Docs Verified \u2192 Counselling Scheduled \u2192 Counselling Done \u2192 Confirmed \u2192 <strong>Converted</strong> | Lost</p>\n\n<h3>Student Statuses</h3>\n<p>Pre-Approval Pending \u2192 Pre-Approval Paid \u2192 CMA Registration \u2192 CMA Registered \u2192 Balance Pending \u2192 Fully Paid \u2192 Enrolled \u2192 <strong>Materials Issued</strong> | Dropped</p>\n\n</div>"
+  },
+  {
+   "fieldname": "section_defaults",
+   "fieldtype": "Section Break",
+   "label": "Defaults"
+  },
+  {
+   "fieldname": "default_program",
+   "fieldtype": "Link",
+   "label": "Default Program",
+   "options": "EE Program"
+  },
+  {
+   "fieldname": "default_batch",
+   "fieldtype": "Link",
+   "label": "Default Batch",
+   "options": "EE Batch"
+  },
+  {
+   "fieldname": "default_company",
+   "fieldtype": "Link",
+   "label": "Default Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "column_break_defaults",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "billing_currency",
+   "fieldtype": "Link",
+   "label": "Billing Currency (to student)",
+   "options": "Currency",
+   "default": "AED",
+   "reqd": 1
+  },
+  {
+   "fieldname": "deposit_account",
+   "fieldtype": "Link",
+   "label": "AED Deposit Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "default_income_account",
+   "fieldtype": "Link",
+   "label": "Default Income Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "service_item",
+   "fieldtype": "Link",
+   "label": "Service Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "section_nomod",
+   "fieldtype": "Section Break",
+   "label": "Nomod"
+  },
+  {
+   "fieldname": "nomod_api_base_url",
+   "fieldtype": "Data",
+   "label": "Nomod API Base URL"
+  },
+  {
+   "fieldname": "nomod_api_key",
+   "fieldtype": "Password",
+   "label": "Nomod API Key"
+  },
+  {
+   "fieldname": "column_break_nomod",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nomod_service_fee_percent",
+   "fieldtype": "Percent",
+   "label": "Service Fee %"
+  },
+  {
+   "fieldname": "section_email_templates",
+   "fieldtype": "Section Break",
+   "label": "Email Templates"
+  },
+  {
+   "fieldname": "brochure_email_template",
+   "fieldtype": "Link",
+   "label": "Brochure Email",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "doc_request_email_template",
+   "fieldtype": "Link",
+   "label": "Document Request Email",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "pre_approval_email_template",
+   "fieldtype": "Link",
+   "label": "Pre-Approval Email",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_email",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "payment_receipt_email_template",
+   "fieldtype": "Link",
+   "label": "Payment Receipt Email",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "balance_payment_email_template",
+   "fieldtype": "Link",
+   "label": "Balance Payment Email",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "welcome_email_template",
+   "fieldtype": "Link",
+   "label": "Welcome / Final Email",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "section_brochure",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "default_brochure",
+   "fieldtype": "Attach",
+   "label": "Brochure Attachment"
+  },
+  {
+   "fieldname": "section_sla",
+   "fieldtype": "Section Break",
+   "label": "SLA / KPI Timers"
+  },
+  {
+   "fieldname": "first_contact_sla_minutes",
+   "fieldtype": "Int",
+   "label": "First-Contact SLA (min)",
+   "default": "30"
+  },
+  {
+   "fieldname": "doc_turnaround_sla_hours",
+   "fieldtype": "Int",
+   "label": "Document SLA (hrs)",
+   "default": "48"
+  },
+  {
+   "fieldname": "column_break_sla",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "post_counselling_payment_sla_hours",
+   "fieldtype": "Int",
+   "label": "Post-Counselling Payment SLA (hrs)",
+   "default": "24"
+  },
+  {
+   "fieldname": "full_payment_sla_days",
+   "fieldtype": "Int",
+   "label": "Full Payment SLA (days)",
+   "default": "7"
+  }
+ ],
+ "links": [],
+ "modified": "2026-05-29 20:19:57.041793",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "ExpertEdge Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "role": "EE Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

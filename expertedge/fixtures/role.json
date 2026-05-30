@@ -1,0 +1,30 @@
+[
+ {
+  "doctype": "Role",
+  "name": "EE Telecaller",
+  "role_name": "EE Telecaller",
+  "desk_access": 1,
+  "is_custom": 1
+ },
+ {
+  "doctype": "Role",
+  "name": "EE Academic Counsellor",
+  "role_name": "EE Academic Counsellor",
+  "desk_access": 1,
+  "is_custom": 1
+ },
+ {
+  "doctype": "Role",
+  "name": "EE Finance",
+  "role_name": "EE Finance",
+  "desk_access": 1,
+  "is_custom": 1
+ },
+ {
+  "doctype": "Role",
+  "name": "EE Manager",
+  "role_name": "EE Manager",
+  "desk_access": 1,
+  "is_custom": 1
+ }
+]

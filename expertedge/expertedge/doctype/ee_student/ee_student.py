@@ -1,0 +1,244 @@
+import frappe
+from frappe import _
+from frappe.model.document import Document
+from frappe.utils import now_datetime, nowdate, flt
+
+
+class EEStudent(Document):
+	def validate(self):
+		self._resolve_fees()
+		self._compute_net_fee()
+		self._recompute_outstanding()
+		self._ensure_follow_up_todos()
+
+	def _resolve_fees(self):
+		"""Resolve total_fee from Batch (override) or Program."""
+		settings = frappe.get_cached_doc("ExpertEdge Settings")
+		self.billing_currency = settings.billing_currency or "AED"
+
+		if self.batch:
+			batch = frappe.get_cached_doc("EE Batch", self.batch)
+			if batch.override_fee:
+				self.total_fee = batch.total_fee
+			else:
+				program = frappe.get_cached_doc("EE Program", batch.program)
+				self.total_fee = program.total_fee
+			if not self.program:
+				self.program = batch.program
+		elif self.program:
+			program = frappe.get_cached_doc("EE Program", self.program)
+			self.total_fee = program.total_fee
+
+		if self.program and not self.pre_approval_fee:
+			program = frappe.get_cached_doc("EE Program", self.program)
+			self.pre_approval_fee = program.pre_approval_fee
+
+	def _compute_net_fee(self):
+		if self.apply_lumpsum_discount and self.program:
+			program = frappe.get_cached_doc("EE Program", self.program)
+			discount_pct = flt(program.lumpsum_discount_percent)
+			self.net_fee = flt(self.total_fee) * (1 - discount_pct / 100)
+		else:
+			self.net_fee = flt(self.total_fee)
+
+	def _recompute_outstanding(self):
+		self.outstanding = flt(self.net_fee) - flt(self.total_paid)
+
+	def _ensure_follow_up_todos(self):
+		for row in (self.call_log or []):
+			if row.next_call_on:
+				self._ensure_todo(
+					row.caller or self.handled_by or self.owner,
+					f"Follow-up call for student {self.student_name}",
+					row.next_call_on,
+				)
+		for row in (self.activity_log or []):
+			if row.follow_up_on:
+				self._ensure_todo(
+					row.user or self.handled_by or self.owner,
+					f"Follow-up for student {self.student_name}: {row.summary or ''}",
+					row.follow_up_on,
+				)
+
+	def _ensure_todo(self, allocated_to, description, date):
+		existing = frappe.db.exists("ToDo", {
+			"reference_type": "EE Student",
+			"reference_name": self.name,
+			"allocated_to": allocated_to,
+			"description": description,
+			"status": "Open",
+		})
+		if not existing:
+			frappe.get_doc({
+				"doctype": "ToDo",
+				"allocated_to": allocated_to,
+				"reference_type": "EE Student",
+				"reference_name": self.name,
+				"description": description,
+				"date": str(date)[:10] if date else nowdate(),
+				"status": "Open",
+			}).insert(ignore_permissions=True)
+
+	def _log_system_activity(self, summary):
+		self.append("activity_log", {
+			"activity_on": now_datetime(),
+			"activity_type": "System",
+			"user": frappe.session.user,
+			"summary": summary,
+		})
+
+	@frappe.whitelist()
+	def create_customer_and_invoice(self):
+		"""Create Customer + submitted Sales Invoice. Idempotent."""
+		if self.sales_invoice:
+			return self.sales_invoice
+
+		settings = frappe.get_cached_doc("ExpertEdge Settings")
+		if not settings.default_company:
+			frappe.throw(_("Default Company not set in ExpertEdge Settings"))
+		if not settings.service_item:
+			frappe.throw(_("Service Item not set in ExpertEdge Settings"))
+
+		# Create Customer if needed
+		if not self.customer:
+			customer = frappe.get_doc({
+				"doctype": "Customer",
+				"customer_name": self.student_name,
+				"customer_type": "Individual",
+				"customer_group": "Individual",
+				"territory": "All Territories",
+			})
+			customer.insert(ignore_permissions=True)
+			self.customer = customer.name
+
+		# Create Sales Invoice
+		si = frappe.get_doc({
+			"doctype": "Sales Invoice",
+			"customer": self.customer,
+			"company": settings.default_company,
+			"currency": self.billing_currency or "AED",
+			"conversion_rate": 1,  # ERPNext will fetch the actual rate
+			"items": [{
+				"item_code": settings.service_item,
+				"qty": 1,
+				"rate": flt(self.net_fee),
+				"income_account": settings.default_income_account,
+			}],
+		})
+		si.insert(ignore_permissions=True)
+		si.submit()
+
+		self.sales_invoice = si.name
+		self._log_system_activity(f"Customer {self.customer} and Invoice {si.name} created")
+		self.save(ignore_permissions=True)
+		return si.name
+
+	@frappe.whitelist()
+	def generate_pre_approval_link(self):
+		self._ensure_invoice_exists()
+		link = frappe.get_doc({
+			"doctype": "EE Nomod Payment Link",
+			"student": self.name,
+			"purpose": "Pre-Approval",
+			"amount": flt(self.pre_approval_fee),
+			"currency": self.billing_currency or "AED",
+			"sales_invoice": self.sales_invoice,
+		})
+		link.insert(ignore_permissions=True)
+		link.generate_nomod_link()
+		self._log_system_activity(f"Pre-approval payment link {link.name} generated")
+		self.save(ignore_permissions=True)
+		return link.name
+
+	@frappe.whitelist()
+	def generate_balance_link(self):
+		self._ensure_invoice_exists()
+		self._recompute_outstanding()
+		link = frappe.get_doc({
+			"doctype": "EE Nomod Payment Link",
+			"student": self.name,
+			"purpose": "Balance",
+			"amount": flt(self.outstanding),
+			"currency": self.billing_currency or "AED",
+			"sales_invoice": self.sales_invoice,
+		})
+		link.insert(ignore_permissions=True)
+		link.generate_nomod_link()
+		self._log_system_activity(f"Balance payment link {link.name} generated")
+		self.save(ignore_permissions=True)
+		return link.name
+
+	def _ensure_invoice_exists(self):
+		if not self.sales_invoice:
+			self.create_customer_and_invoice()
+
+	@frappe.whitelist()
+	def send_pre_approval_email(self):
+		self._send_template_email("pre_approval_email_template", "Pre-approval email sent")
+
+	@frappe.whitelist()
+	def send_receipt_email(self):
+		self._send_template_email("payment_receipt_email_template", "Payment receipt email sent")
+
+	@frappe.whitelist()
+	def send_balance_email(self):
+		self._send_template_email("balance_payment_email_template", "Balance payment email sent")
+
+	@frappe.whitelist()
+	def send_welcome_email(self):
+		self._send_template_email("welcome_email_template", "Welcome email sent")
+
+	def _send_template_email(self, template_field, log_message):
+		settings = frappe.get_cached_doc("ExpertEdge Settings")
+		template_name = settings.get(template_field)
+		if not template_name:
+			frappe.throw(_("Email template '{0}' not set in ExpertEdge Settings").format(template_field))
+
+		template = frappe.get_doc("Email Template", template_name)
+		message = frappe.render_template(template.response_, {"doc": self})
+		subject = frappe.render_template(template.subject, {"doc": self})
+
+		frappe.sendmail(
+			recipients=[self.email],
+			subject=subject,
+			message=message,
+			reference_doctype="EE Student",
+			reference_name=self.name,
+		)
+
+		self._log_system_activity(log_message)
+		self.save(ignore_permissions=True)
+
+	@frappe.whitelist()
+	def mark_cma_registered(self):
+		self.cma_registration_status = "Registered"
+		self.cma_registered_on = nowdate()
+		self.status = "CMA Registered"
+		self._log_system_activity("CMA registration confirmed")
+		self.save()
+
+	@frappe.whitelist()
+	def issue_materials(self):
+		self.materials_issued = 1
+		self.materials_issued_on = nowdate()
+		self.status = "Materials Issued"
+		self._log_system_activity("Materials issued to student")
+		self.save()
+
+	@frappe.whitelist()
+	def recalculate_payments(self):
+		"""Sum paid payment links, update total_paid and outstanding."""
+		total = frappe.db.sql("""
+			SELECT COALESCE(SUM(amount), 0)
+			FROM `tabEE Nomod Payment Link`
+			WHERE student = %s AND status = 'Paid'
+		""", self.name)[0][0]
+
+		self.total_paid = flt(total)
+		self.outstanding = flt(self.net_fee) - flt(self.total_paid)
+
+		if self.outstanding <= 0:
+			self.status = "Fully Paid"
+			self._log_system_activity("Fully paid — outstanding cleared")
+
+		self.save(ignore_permissions=True)

@@ -1,0 +1,388 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2026-05-29 20:19:57.041793",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "lead_name",
+  "email",
+  "mobile_no",
+  "column_break_candidate",
+  "nationality",
+  "highest_qualification",
+  "years_of_experience",
+  "current_designation",
+  "program",
+  "section_lead_mgmt",
+  "status",
+  "lead_source",
+  "campaign",
+  "handled_by",
+  "column_break_mgmt",
+  "counsellor",
+  "preferred_batch",
+  "priority",
+  "next_action",
+  "next_action_date",
+  "lost_reason",
+  "section_documents",
+  "documents",
+  "documents_verified",
+  "verified_by",
+  "section_call_log",
+  "call_log",
+  "section_activity_log",
+  "activity_log",
+  "section_counselling",
+  "counselling_outcome",
+  "latest_session",
+  "section_sla",
+  "lead_received_on",
+  "first_contacted_on",
+  "brochure_sent_on",
+  "docs_requested_on",
+  "column_break_sla",
+  "docs_received_on",
+  "docs_verified_on",
+  "counselling_done_on",
+  "confirmed_on",
+  "converted_on",
+  "section_conversion",
+  "converted",
+  "student"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "EE-LEAD-.YYYY.-.#####",
+   "default": "EE-LEAD-.YYYY.-.#####",
+   "hidden": 1
+  },
+  {
+   "fieldname": "lead_name",
+   "fieldtype": "Data",
+   "label": "Full Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "mobile_no",
+   "fieldtype": "Data",
+   "label": "Mobile No",
+   "options": "Phone",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_candidate",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nationality",
+   "fieldtype": "Link",
+   "label": "Nationality",
+   "options": "Country"
+  },
+  {
+   "fieldname": "highest_qualification",
+   "fieldtype": "Data",
+   "label": "Highest Qualification"
+  },
+  {
+   "fieldname": "years_of_experience",
+   "fieldtype": "Int",
+   "label": "Years of Experience"
+  },
+  {
+   "fieldname": "current_designation",
+   "fieldtype": "Data",
+   "label": "Current Designation"
+  },
+  {
+   "fieldname": "program",
+   "fieldtype": "Link",
+   "label": "Program",
+   "options": "EE Program"
+  },
+  {
+   "fieldname": "section_lead_mgmt",
+   "fieldtype": "Section Break",
+   "label": "Lead Management"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "New\nContacted\nBrochure Sent\nDocs Requested\nDocs Received\nDocs Verified\nCounselling Scheduled\nCounselling Done\nConfirmed\nConverted\nLost",
+   "default": "New",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "lead_source",
+   "fieldtype": "Link",
+   "label": "Lead Source",
+   "options": "EE Lead Source",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "campaign",
+   "fieldtype": "Data",
+   "label": "Campaign / Ad ID"
+  },
+  {
+   "fieldname": "handled_by",
+   "fieldtype": "Link",
+   "label": "Handled By (Telecaller)",
+   "options": "User",
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "column_break_mgmt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "counsellor",
+   "fieldtype": "Link",
+   "label": "Academic Counsellor",
+   "options": "User"
+  },
+  {
+   "fieldname": "preferred_batch",
+   "fieldtype": "Link",
+   "label": "Preferred Batch",
+   "options": "EE Batch"
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "label": "Priority",
+   "options": "\nLow\nMedium\nHigh"
+  },
+  {
+   "fieldname": "next_action",
+   "fieldtype": "Small Text",
+   "label": "Next Action"
+  },
+  {
+   "fieldname": "next_action_date",
+   "fieldtype": "Datetime",
+   "label": "Next Action Date"
+  },
+  {
+   "fieldname": "lost_reason",
+   "fieldtype": "Small Text",
+   "label": "Lost Reason",
+   "depends_on": "eval:doc.status=='Lost'"
+  },
+  {
+   "fieldname": "section_documents",
+   "fieldtype": "Section Break",
+   "label": "Documents"
+  },
+  {
+   "fieldname": "documents",
+   "fieldtype": "Table",
+   "label": "Documents",
+   "options": "EE Document"
+  },
+  {
+   "fieldname": "documents_verified",
+   "fieldtype": "Check",
+   "label": "All Documents Verified",
+   "read_only": 1
+  },
+  {
+   "fieldname": "verified_by",
+   "fieldtype": "Link",
+   "label": "Verified By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_call_log",
+   "fieldtype": "Section Break",
+   "label": "Call Log"
+  },
+  {
+   "fieldname": "call_log",
+   "fieldtype": "Table",
+   "label": "Call Log",
+   "options": "EE Call Log"
+  },
+  {
+   "fieldname": "section_activity_log",
+   "fieldtype": "Section Break",
+   "label": "Activity Log"
+  },
+  {
+   "fieldname": "activity_log",
+   "fieldtype": "Table",
+   "label": "Activity Log",
+   "options": "EE Activity"
+  },
+  {
+   "fieldname": "section_counselling",
+   "fieldtype": "Section Break",
+   "label": "Counselling"
+  },
+  {
+   "fieldname": "counselling_outcome",
+   "fieldtype": "Select",
+   "label": "Counselling Outcome",
+   "options": "\nPending\nFit \u2013 Confirmed\nFit \u2013 Considering\nNot Fit\nNo Show",
+   "read_only": 1
+  },
+  {
+   "fieldname": "latest_session",
+   "fieldtype": "Link",
+   "label": "Latest Session",
+   "options": "EE Counselling Session",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_sla",
+   "fieldtype": "Section Break",
+   "label": "SLA Timestamps",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "lead_received_on",
+   "fieldtype": "Datetime",
+   "label": "Lead Received On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "first_contacted_on",
+   "fieldtype": "Datetime",
+   "label": "First Contacted On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "brochure_sent_on",
+   "fieldtype": "Datetime",
+   "label": "Brochure Sent On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "docs_requested_on",
+   "fieldtype": "Datetime",
+   "label": "Docs Requested On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_sla",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "docs_received_on",
+   "fieldtype": "Datetime",
+   "label": "Docs Received On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "docs_verified_on",
+   "fieldtype": "Datetime",
+   "label": "Docs Verified On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "counselling_done_on",
+   "fieldtype": "Datetime",
+   "label": "Counselling Done On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "confirmed_on",
+   "fieldtype": "Datetime",
+   "label": "Confirmed On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "converted_on",
+   "fieldtype": "Datetime",
+   "label": "Converted On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_conversion",
+   "fieldtype": "Section Break",
+   "label": "Conversion"
+  },
+  {
+   "fieldname": "converted",
+   "fieldtype": "Check",
+   "label": "Converted",
+   "read_only": 1
+  },
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "label": "Student",
+   "options": "EE Student",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-05-29 20:19:57.041793",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "EE Lead",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "role": "EE Telecaller",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "EE Academic Counsellor",
+   "read": 1,
+   "write": 1
+  },
+  {
+   "role": "EE Finance",
+   "read": 1
+  },
+  {
+   "role": "EE Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "lead_name",
+ "track_changes": 1
+}

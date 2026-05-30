@@ -1,0 +1,4 @@
+lead_name,email,mobile_no,nationality,highest_qualification,years_of_experience,current_designation,lead_source,campaign,program
+John Doe,john.doe@example.com,+971501234567,India,MBA,5,Finance Manager,Instagram,CMA_IG_2026,CMA Australia & New Zealand
+Jane Smith,jane.smith@example.com,+971502345678,United Arab Emirates,BBA,3,Accountant,Facebook,CMA_FB_2026,CMA Australia & New Zealand
+Ahmed Ali,ahmed.ali@example.com,+971503456789,Pakistan,CA Inter,8,CFO,LinkedIn,CMA_LI_2026,CMA Australia & New Zealand

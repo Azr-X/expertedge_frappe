@@ -1,0 +1,438 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2026-05-29 20:19:57.041793",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "student_name",
+  "email",
+  "mobile_no",
+  "column_break_candidate",
+  "nationality",
+  "highest_qualification",
+  "years_of_experience",
+  "current_designation",
+  "program",
+  "batch",
+  "lead",
+  "section_ownership",
+  "status",
+  "counsellor",
+  "handled_by",
+  "column_break_ownership",
+  "next_action",
+  "next_action_date",
+  "section_documents",
+  "documents",
+  "section_call_log",
+  "call_log",
+  "section_activity_log",
+  "activity_log",
+  "section_cma",
+  "cma_registration_status",
+  "cma_candidate_id",
+  "column_break_cma",
+  "cma_registered_on",
+  "cma_confirmation_received",
+  "section_billing",
+  "billing_currency",
+  "total_fee",
+  "apply_lumpsum_discount",
+  "net_fee",
+  "column_break_billing",
+  "pre_approval_fee",
+  "customer",
+  "sales_invoice",
+  "total_paid",
+  "outstanding",
+  "section_schedule",
+  "venue",
+  "program_start_date",
+  "column_break_schedule",
+  "program_timing",
+  "program_country",
+  "materials_issued",
+  "materials_issued_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "EE-STU-.YYYY.-.#####",
+   "default": "EE-STU-.YYYY.-.#####",
+   "hidden": 1
+  },
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "label": "Full Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "mobile_no",
+   "fieldtype": "Data",
+   "label": "Mobile No",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "column_break_candidate",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nationality",
+   "fieldtype": "Link",
+   "label": "Nationality",
+   "options": "Country"
+  },
+  {
+   "fieldname": "highest_qualification",
+   "fieldtype": "Data",
+   "label": "Highest Qualification"
+  },
+  {
+   "fieldname": "years_of_experience",
+   "fieldtype": "Int",
+   "label": "Years of Experience"
+  },
+  {
+   "fieldname": "current_designation",
+   "fieldtype": "Data",
+   "label": "Current Designation"
+  },
+  {
+   "fieldname": "program",
+   "fieldtype": "Link",
+   "label": "Program",
+   "options": "EE Program"
+  },
+  {
+   "fieldname": "batch",
+   "fieldtype": "Link",
+   "label": "Batch",
+   "options": "EE Batch"
+  },
+  {
+   "fieldname": "lead",
+   "fieldtype": "Link",
+   "label": "Source Lead",
+   "options": "EE Lead",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_ownership",
+   "fieldtype": "Section Break",
+   "label": "Ownership"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Pre-Approval Pending\nPre-Approval Paid\nCMA Registration\nCMA Registered\nBalance Pending\nFully Paid\nEnrolled\nMaterials Issued\nDropped",
+   "default": "Pre-Approval Pending",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "counsellor",
+   "fieldtype": "Link",
+   "label": "Counsellor",
+   "options": "User"
+  },
+  {
+   "fieldname": "handled_by",
+   "fieldtype": "Link",
+   "label": "Handled By (Finance)",
+   "options": "User",
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "column_break_ownership",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "next_action",
+   "fieldtype": "Small Text",
+   "label": "Next Action"
+  },
+  {
+   "fieldname": "next_action_date",
+   "fieldtype": "Datetime",
+   "label": "Next Action Date"
+  },
+  {
+   "fieldname": "section_documents",
+   "fieldtype": "Section Break",
+   "label": "Documents"
+  },
+  {
+   "fieldname": "documents",
+   "fieldtype": "Table",
+   "label": "Documents",
+   "options": "EE Document"
+  },
+  {
+   "fieldname": "section_call_log",
+   "fieldtype": "Section Break",
+   "label": "Call Log"
+  },
+  {
+   "fieldname": "call_log",
+   "fieldtype": "Table",
+   "label": "Call Log",
+   "options": "EE Call Log"
+  },
+  {
+   "fieldname": "section_activity_log",
+   "fieldtype": "Section Break",
+   "label": "Activity Log"
+  },
+  {
+   "fieldname": "activity_log",
+   "fieldtype": "Table",
+   "label": "Activity Log",
+   "options": "EE Activity"
+  },
+  {
+   "fieldname": "section_cma",
+   "fieldtype": "Section Break",
+   "label": "CMA Registration"
+  },
+  {
+   "fieldname": "cma_registration_status",
+   "fieldtype": "Select",
+   "label": "CMA Registration Status",
+   "options": "Not Started\nIn Progress\nRegistered",
+   "default": "Not Started"
+  },
+  {
+   "fieldname": "cma_candidate_id",
+   "fieldtype": "Data",
+   "label": "CMA Candidate ID"
+  },
+  {
+   "fieldname": "column_break_cma",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cma_registered_on",
+   "fieldtype": "Date",
+   "label": "Registered On"
+  },
+  {
+   "fieldname": "cma_confirmation_received",
+   "fieldtype": "Check",
+   "label": "Confirmation Received"
+  },
+  {
+   "fieldname": "section_billing",
+   "fieldtype": "Section Break",
+   "label": "Billing",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "billing_currency",
+   "fieldtype": "Link",
+   "label": "Billing Currency",
+   "options": "Currency",
+   "default": "AED",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "total_fee",
+   "fieldtype": "Currency",
+   "label": "Total Fee",
+   "options": "billing_currency",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "apply_lumpsum_discount",
+   "fieldtype": "Check",
+   "label": "Apply Lump-sum Discount",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "net_fee",
+   "fieldtype": "Currency",
+   "label": "Net Fee",
+   "options": "billing_currency",
+   "read_only": 1,
+   "permlevel": 1
+  },
+  {
+   "fieldname": "column_break_billing",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "pre_approval_fee",
+   "fieldtype": "Currency",
+   "label": "Pre-Approval Fee",
+   "options": "billing_currency",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "read_only": 1,
+   "permlevel": 1
+  },
+  {
+   "fieldname": "sales_invoice",
+   "fieldtype": "Link",
+   "label": "Sales Invoice",
+   "options": "Sales Invoice",
+   "read_only": 1,
+   "permlevel": 1
+  },
+  {
+   "fieldname": "total_paid",
+   "fieldtype": "Currency",
+   "label": "Total Paid",
+   "options": "billing_currency",
+   "read_only": 1,
+   "permlevel": 1
+  },
+  {
+   "fieldname": "outstanding",
+   "fieldtype": "Currency",
+   "label": "Outstanding",
+   "options": "billing_currency",
+   "read_only": 1,
+   "permlevel": 1
+  },
+  {
+   "fieldname": "section_schedule",
+   "fieldtype": "Section Break",
+   "label": "Program Schedule (Welcome)"
+  },
+  {
+   "fieldname": "venue",
+   "fieldtype": "Small Text",
+   "label": "Venue",
+   "fetch_from": "batch.venue",
+   "read_only": 1
+  },
+  {
+   "fieldname": "program_start_date",
+   "fieldtype": "Date",
+   "label": "Start Date",
+   "fetch_from": "batch.start_date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_schedule",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "program_timing",
+   "fieldtype": "Data",
+   "label": "Timing",
+   "fetch_from": "batch.timing",
+   "read_only": 1
+  },
+  {
+   "fieldname": "program_country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country",
+   "fetch_from": "batch.country",
+   "read_only": 1
+  },
+  {
+   "fieldname": "materials_issued",
+   "fieldtype": "Check",
+   "label": "Materials Issued"
+  },
+  {
+   "fieldname": "materials_issued_on",
+   "fieldtype": "Date",
+   "label": "Issued On"
+  }
+ ],
+ "links": [
+  {
+   "group": "Payments",
+   "link_doctype": "EE Nomod Payment Link",
+   "link_fieldname": "student"
+  }
+ ],
+ "modified": "2026-05-29 20:19:57.041793",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "EE Student",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "role": "EE Academic Counsellor",
+   "read": 1,
+   "write": 1
+  },
+  {
+   "role": "EE Finance",
+   "read": 1,
+   "write": 1
+  },
+  {
+   "role": "EE Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  },
+  {
+   "role": "EE Academic Counsellor",
+   "read": 1,
+   "permlevel": 1
+  },
+  {
+   "role": "EE Finance",
+   "read": 1,
+   "write": 1,
+   "permlevel": 1
+  },
+  {
+   "role": "EE Manager",
+   "read": 1,
+   "write": 1,
+   "permlevel": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "student_name",
+ "track_changes": 1
+}

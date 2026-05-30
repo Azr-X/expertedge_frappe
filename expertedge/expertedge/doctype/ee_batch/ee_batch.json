@@ -1,0 +1,209 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2026-05-29 20:19:57.041793",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "batch_name",
+  "program",
+  "status",
+  "column_break_1",
+  "country",
+  "city",
+  "venue",
+  "is_active",
+  "section_break_schedule",
+  "start_date",
+  "end_date",
+  "column_break_2",
+  "timing",
+  "language",
+  "section_break_capacity",
+  "capacity",
+  "seats_filled",
+  "section_break_fee",
+  "override_fee",
+  "total_fee",
+  "currency"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "EE-BATCH-.YYYY.-.###",
+   "default": "EE-BATCH-.YYYY.-.###",
+   "hidden": 1
+  },
+  {
+   "fieldname": "batch_name",
+   "fieldtype": "Data",
+   "label": "Batch Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "program",
+   "fieldtype": "Link",
+   "label": "Program",
+   "options": "EE Program",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Planned\nOpen for Enrollment\nRunning\nCompleted\nCancelled",
+   "default": "Planned",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country",
+   "reqd": 1
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "venue",
+   "fieldtype": "Small Text",
+   "label": "Venue"
+  },
+  {
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Active",
+   "default": "1"
+  },
+  {
+   "fieldname": "section_break_schedule",
+   "fieldtype": "Section Break",
+   "label": "Schedule"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "timing",
+   "fieldtype": "Data",
+   "label": "Timing"
+  },
+  {
+   "fieldname": "language",
+   "fieldtype": "Data",
+   "label": "Language",
+   "default": "English"
+  },
+  {
+   "fieldname": "section_break_capacity",
+   "fieldtype": "Section Break",
+   "label": "Capacity"
+  },
+  {
+   "fieldname": "capacity",
+   "fieldtype": "Int",
+   "label": "Seat Capacity"
+  },
+  {
+   "fieldname": "seats_filled",
+   "fieldtype": "Int",
+   "label": "Seats Filled",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_fee",
+   "fieldtype": "Section Break",
+   "label": "Fee Override"
+  },
+  {
+   "fieldname": "override_fee",
+   "fieldtype": "Check",
+   "label": "Override Program Fee"
+  },
+  {
+   "fieldname": "total_fee",
+   "fieldtype": "Currency",
+   "label": "Batch Total Fee",
+   "depends_on": "override_fee",
+   "mandatory_depends_on": "override_fee",
+   "options": "currency"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Batch Currency",
+   "options": "Currency",
+   "default": "AED",
+   "depends_on": "override_fee"
+  }
+ ],
+ "links": [],
+ "modified": "2026-05-29 20:19:57.041793",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "EE Batch",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "role": "EE Telecaller",
+   "read": 1
+  },
+  {
+   "role": "EE Academic Counsellor",
+   "read": 1
+  },
+  {
+   "role": "EE Finance",
+   "read": 1
+  },
+  {
+   "role": "EE Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "batch_name",
+ "track_changes": 1
+}

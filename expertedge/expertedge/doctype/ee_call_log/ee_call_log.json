@@ -1,0 +1,87 @@
+{
+ "actions": [],
+ "creation": "2026-05-29 20:19:57.041793",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "istable": 1,
+ "field_order": [
+  "call_on",
+  "caller",
+  "direction",
+  "call_result",
+  "column_break_1",
+  "duration_min",
+  "summary",
+  "next_call_on",
+  "recording_url"
+ ],
+ "fields": [
+  {
+   "fieldname": "call_on",
+   "fieldtype": "Datetime",
+   "label": "Date/Time",
+   "default": "Now",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "caller",
+   "fieldtype": "Link",
+   "label": "Called By",
+   "options": "User",
+   "default": "__user",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "direction",
+   "fieldtype": "Select",
+   "label": "Direction",
+   "options": "Outbound\nInbound",
+   "default": "Outbound"
+  },
+  {
+   "fieldname": "call_result",
+   "fieldtype": "Select",
+   "label": "Result",
+   "options": "Connected\nNo Answer\nBusy\nSwitched Off\nNot Reachable\nWrong Number\nCall Back Later\nInterested\nNot Interested\nFollow-up Scheduled",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "duration_min",
+   "fieldtype": "Float",
+   "label": "Duration (min)"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Small Text",
+   "label": "Notes",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "next_call_on",
+   "fieldtype": "Datetime",
+   "label": "Next Call On"
+  },
+  {
+   "fieldname": "recording_url",
+   "fieldtype": "Data",
+   "label": "Recording URL"
+  }
+ ],
+ "links": [],
+ "modified": "2026-05-29 20:19:57.041793",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "EE Call Log",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

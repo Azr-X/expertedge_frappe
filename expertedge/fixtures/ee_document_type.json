@@ -1,0 +1,29 @@
+[
+ {
+  "doctype": "EE Document Type",
+  "name": "Resume / CV",
+  "document_type": "Resume / CV",
+  "is_mandatory": 1,
+  "applies_to": "Both",
+  "sort_order": 10,
+  "is_active": 1
+ },
+ {
+  "doctype": "EE Document Type",
+  "name": "Degree Certificate",
+  "document_type": "Degree Certificate",
+  "is_mandatory": 1,
+  "applies_to": "Both",
+  "sort_order": 20,
+  "is_active": 1
+ },
+ {
+  "doctype": "EE Document Type",
+  "name": "Transcript",
+  "document_type": "Transcript",
+  "is_mandatory": 1,
+  "applies_to": "Both",
+  "sort_order": 30,
+  "is_active": 1
+ }
+]

@@ -1,0 +1,149 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2026-05-29 20:19:57.041793",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "lead",
+  "candidate_name",
+  "counsellor",
+  "column_break_1",
+  "mode",
+  "scheduled_on",
+  "conducted_on",
+  "duration_minutes",
+  "section_outcome",
+  "outcome",
+  "notes",
+  "recommended_next_step"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "EE-CS-.YYYY.-.#####",
+   "default": "EE-CS-.YYYY.-.#####",
+   "hidden": 1
+  },
+  {
+   "fieldname": "lead",
+   "fieldtype": "Link",
+   "label": "Lead",
+   "options": "EE Lead",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "candidate_name",
+   "fieldtype": "Data",
+   "label": "Candidate",
+   "fetch_from": "lead.lead_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "counsellor",
+   "fieldtype": "Link",
+   "label": "Counsellor",
+   "options": "User",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "label": "Mode",
+   "options": "Phone\nVideo\nIn-person"
+  },
+  {
+   "fieldname": "scheduled_on",
+   "fieldtype": "Datetime",
+   "label": "Scheduled On"
+  },
+  {
+   "fieldname": "conducted_on",
+   "fieldtype": "Datetime",
+   "label": "Conducted On"
+  },
+  {
+   "fieldname": "duration_minutes",
+   "fieldtype": "Int",
+   "label": "Duration (min)"
+  },
+  {
+   "fieldname": "section_outcome",
+   "fieldtype": "Section Break",
+   "label": "Outcome"
+  },
+  {
+   "fieldname": "outcome",
+   "fieldtype": "Select",
+   "label": "Outcome",
+   "options": "\nReschedule\nNo Show\nNot Fit\nFit \u2013 Considering\nFit \u2013 Confirmed",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "recommended_next_step",
+   "fieldtype": "Small Text",
+   "label": "Recommended Next Step"
+  }
+ ],
+ "links": [],
+ "modified": "2026-05-29 20:19:57.041793",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "EE Counselling Session",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "role": "EE Telecaller",
+   "read": 1
+  },
+  {
+   "role": "EE Academic Counsellor",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "EE Finance",
+   "read": 1
+  },
+  {
+   "role": "EE Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

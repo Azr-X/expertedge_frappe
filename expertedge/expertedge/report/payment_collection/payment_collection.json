@@ -1,0 +1,28 @@
+{
+ "add_total_row": 1,
+ "columns": [],
+ "creation": "2026-05-29 20:19:57.041793",
+ "disabled": 0,
+ "doctype": "Report",
+ "filters": [],
+ "is_standard": "Yes",
+ "modified": "2026-05-29 20:19:57.041793",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "Payment Collection",
+ "owner": "Administrator",
+ "ref_doctype": "EE Student",
+ "report_name": "Payment Collection",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "EE Manager"
+  },
+  {
+   "role": "EE Finance"
+  }
+ ]
+}

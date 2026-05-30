@@ -1,0 +1,37 @@
+[
+ {
+  "doctype": "EE Lead Source",
+  "name": "Instagram",
+  "source_name": "Instagram",
+  "channel": "Paid Ad",
+  "is_active": 1
+ },
+ {
+  "doctype": "EE Lead Source",
+  "name": "Facebook",
+  "source_name": "Facebook",
+  "channel": "Paid Ad",
+  "is_active": 1
+ },
+ {
+  "doctype": "EE Lead Source",
+  "name": "LinkedIn",
+  "source_name": "LinkedIn",
+  "channel": "Paid Ad",
+  "is_active": 1
+ },
+ {
+  "doctype": "EE Lead Source",
+  "name": "Referral",
+  "source_name": "Referral",
+  "channel": "Referral",
+  "is_active": 1
+ },
+ {
+  "doctype": "EE Lead Source",
+  "name": "Website",
+  "source_name": "Website",
+  "channel": "Organic",
+  "is_active": 1
+ }
+]

@@ -1,0 +1,62 @@
+[
+ {
+  "doctype": "Web Form",
+  "name": "program-enquiry",
+  "title": "Program Enquiry",
+  "route": "program-enquiry",
+  "doc_type": "EE Lead",
+  "published": 1,
+  "allow_edit": 0,
+  "allow_multiple": 1,
+  "login_required": 0,
+  "introduction_text": "<p>Interested in the CMA Australia & New Zealand program? Fill in the form below and our team will get in touch with you shortly.</p>",
+  "success_message": "Thank you for your interest! Our team will contact you shortly.",
+  "success_url": "",
+  "is_standard": 1,
+  "module": "Expertedge",
+  "web_form_fields": [
+   {
+    "fieldname": "lead_name",
+    "fieldtype": "Data",
+    "label": "Full Name",
+    "reqd": 1,
+    "idx": 1
+   },
+   {
+    "fieldname": "email",
+    "fieldtype": "Data",
+    "label": "Email",
+    "options": "Email",
+    "reqd": 1,
+    "idx": 2
+   },
+   {
+    "fieldname": "mobile_no",
+    "fieldtype": "Data",
+    "label": "Mobile No",
+    "options": "Phone",
+    "reqd": 1,
+    "idx": 3
+   },
+   {
+    "fieldname": "nationality",
+    "fieldtype": "Link",
+    "label": "Nationality",
+    "options": "Country",
+    "idx": 4
+   },
+   {
+    "fieldname": "highest_qualification",
+    "fieldtype": "Data",
+    "label": "Highest Qualification",
+    "idx": 5
+   },
+   {
+    "fieldname": "years_of_experience",
+    "fieldtype": "Int",
+    "label": "Years of Experience",
+    "idx": 6
+   }
+  ]
+ }
+]
