@@ -12,7 +12,7 @@ app_include_css = "/assets/expertedge/css/expertedge.css"
 fixtures = [
 	{
 		"dt": "EE Lead Source",
-		"filters": [["source_name", "in", ["Instagram", "Facebook", "LinkedIn", "Referral", "Website"]]],
+		"filters": [["source_name", "in", ["Instagram", "Facebook", "LinkedIn", "Referral", "Website", "Contact Form"]]],
 	},
 	{
 		"dt": "EE Document Type",

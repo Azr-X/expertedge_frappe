@@ -11,6 +11,7 @@
   "mobile_no",
   "column_break_candidate",
   "nationality",
+  "state",
   "highest_qualification",
   "years_of_experience",
   "current_designation",
@@ -27,6 +28,7 @@
   "next_action",
   "next_action_date",
   "lost_reason",
+  "remarks",
   "section_documents",
   "documents",
   "documents_verified",
@@ -94,6 +96,11 @@
    "fieldtype": "Link",
    "label": "Nationality",
    "options": "Country"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
   },
   {
    "fieldname": "highest_qualification",
@@ -188,6 +195,11 @@
    "fieldtype": "Small Text",
    "label": "Lost Reason",
    "depends_on": "eval:doc.status=='Lost'"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
   },
   {
    "fieldname": "section_documents",
@@ -347,7 +359,7 @@
   }
  ],
  "links": [],
- "modified": "2026-05-31 12:00:00.000000",
+ "modified": "2026-06-01 13:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "EE Lead",

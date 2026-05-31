@@ -16,7 +16,7 @@ class EELead(Document):
 		self._log_system_activity(f"Lead created via {self.lead_source}")
 
 	def validate(self):
-		if not self.handled_by:
+		if not self.handled_by and frappe.session.user != "Guest":
 			self.handled_by = frappe.session.user
 		self._stamp_first_contact()
 		self._ensure_follow_up_todos()
