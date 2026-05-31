@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"cb_banner\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Banner\",\"col\":12}},{\"id\":\"sp_banner\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"cb_stats\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Quick Stats\",\"col\":12}},{\"id\":\"sp0\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"cb_source\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Leads by Source\",\"col\":6}},{\"id\":\"cb_funnel\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Conversion Funnel\",\"col\":6}},{\"id\":\"sp1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"cb_pay\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Payments by Month\",\"col\":6}},{\"id\":\"cb_enroll\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Enrollments by Batch\",\"col\":6}},{\"id\":\"sp2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"h_quick\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h5\\\"><b>Quick Actions</b></span>\",\"col\":12}},{\"id\":\"s_new_lead\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Lead\",\"col\":3}},{\"id\":\"s_new_student\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Counselling Session\",\"col\":3}},{\"id\":\"s_new_payment\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Payment Link\",\"col\":3}},{\"id\":\"s_settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"ExpertEdge Settings\",\"col\":3}},{\"id\":\"s_all_leads\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Leads\",\"col\":3}},{\"id\":\"s_all_students\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Students\",\"col\":3}},{\"id\":\"s_all_sessions\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Sessions\",\"col\":3}},{\"id\":\"s_all_payments\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Payment Links\",\"col\":3}},{\"id\":\"s_new_leads\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Leads\",\"col\":3}},{\"id\":\"s_confirmed\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Confirmed Leads\",\"col\":3}},{\"id\":\"s_pre_approval\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pre-Approval Pending\",\"col\":3}},{\"id\":\"s_balance\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Balance Pending\",\"col\":3}},{\"id\":\"sp5\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"card_leads\",\"type\":\"card\",\"data\":{\"card_name\":\"Lead Management\",\"col\":4}},{\"id\":\"card_students\",\"type\":\"card\",\"data\":{\"card_name\":\"Student Management\",\"col\":4}},{\"id\":\"card_setup\",\"type\":\"card\",\"data\":{\"card_name\":\"Setup\",\"col\":4}},{\"id\":\"sp6\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"h_reports\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h5\\\"><b>Reports</b></span>\",\"col\":12}},{\"id\":\"sr1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Conversion Funnel Report\",\"col\":3}},{\"id\":\"sr2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Telecaller Performance\",\"col\":3}},{\"id\":\"sr3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Call Activity\",\"col\":3}},{\"id\":\"sr4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Counsellor Performance\",\"col\":3}},{\"id\":\"sr5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payment Collection\",\"col\":3}}]",
+ "content": "[{\"id\":\"cb_banner\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Banner\",\"col\":12}},{\"id\":\"cb_stats\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Quick Stats\",\"col\":12}},{\"id\":\"cb_source\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Leads by Source\",\"col\":6}},{\"id\":\"cb_activity2\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Recent Activity\",\"col\":6}},{\"id\":\"cb_paylinks\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Payment Links\",\"col\":6}},{\"id\":\"cb_enroll\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"EE - Enrollments by Batch\",\"col\":6}},{\"id\":\"sp_extra\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"sp2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"h_quick\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h5\\\"><b>Quick Actions</b></span>\",\"col\":12}},{\"id\":\"s_new_lead\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Lead\",\"col\":3}},{\"id\":\"s_new_student\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Counselling Session\",\"col\":3}},{\"id\":\"s_new_payment\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Payment Link\",\"col\":3}},{\"id\":\"s_settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"ExpertEdge Settings\",\"col\":3}},{\"id\":\"s_all_leads\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Leads\",\"col\":3}},{\"id\":\"s_all_students\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Students\",\"col\":3}},{\"id\":\"s_all_sessions\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Sessions\",\"col\":3}},{\"id\":\"s_all_payments\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Payment Links\",\"col\":3}},{\"id\":\"s_new_leads\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Leads\",\"col\":3}},{\"id\":\"s_confirmed\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Confirmed Leads\",\"col\":3}},{\"id\":\"s_pre_approval\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pre-Approval Pending\",\"col\":3}},{\"id\":\"s_balance\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Balance Pending\",\"col\":3}},{\"id\":\"sp5\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"card_leads\",\"type\":\"card\",\"data\":{\"card_name\":\"Lead Management\",\"col\":4}},{\"id\":\"card_students\",\"type\":\"card\",\"data\":{\"card_name\":\"Student Management\",\"col\":4}},{\"id\":\"card_setup\",\"type\":\"card\",\"data\":{\"card_name\":\"Setup\",\"col\":4}},{\"id\":\"sp6\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"h_reports\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h5\\\"><b>Reports</b></span>\",\"col\":12}},{\"id\":\"sr1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Conversion Funnel Report\",\"col\":3}},{\"id\":\"sr2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Telecaller Performance\",\"col\":3}},{\"id\":\"sr3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Call Activity\",\"col\":3}},{\"id\":\"sr4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Counsellor Performance\",\"col\":3}},{\"id\":\"sr5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payment Collection\",\"col\":3}}]",
  "creation": "2026-05-29 20:23:09.041851",
  "custom_blocks": [
   {
@@ -16,16 +16,16 @@
    "label": "EE - Leads by Source"
   },
   {
-   "custom_block_name": "EE - Conversion Funnel",
-   "label": "EE - Conversion Funnel"
-  },
-  {
-   "custom_block_name": "EE - Payments by Month",
-   "label": "EE - Payments by Month"
-  },
-  {
    "custom_block_name": "EE - Enrollments by Batch",
    "label": "EE - Enrollments by Batch"
+  },
+  {
+   "custom_block_name": "EE - Payment Links",
+   "label": "EE - Payment Links"
+  },
+  {
+   "custom_block_name": "EE - Recent Activity",
+   "label": "EE - Recent Activity"
   }
  ],
  "docstatus": 0,
@@ -154,9 +154,19 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Nomod Settings",
+   "link_count": 0,
+   "link_to": "Nomod Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2026-05-30 13:34:32.459409",
+ "modified": "2026-05-30 19:29:29.274832",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "ExpertEdge",

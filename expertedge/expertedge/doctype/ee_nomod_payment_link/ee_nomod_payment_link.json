@@ -56,7 +56,7 @@
    "fieldname": "purpose",
    "fieldtype": "Select",
    "label": "Purpose",
-   "options": "Pre-Approval\nBalance\nPartial\nOther",
+   "options": "Pre-Approval\nBalance\nPartial\nFull Payment\nOther",
    "in_list_view": 1
   },
   {
@@ -165,7 +165,7 @@
   }
  ],
  "links": [],
- "modified": "2026-05-29 20:19:57.041793",
+ "modified": "2026-05-30 20:14:00.992767",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "EE Nomod Payment Link",

@@ -16,6 +16,8 @@ class EELead(Document):
 		self._log_system_activity(f"Lead created via {self.lead_source}")
 
 	def validate(self):
+		if not self.handled_by:
+			self.handled_by = frappe.session.user
 		self._stamp_first_contact()
 		self._ensure_follow_up_todos()
 
@@ -59,6 +61,39 @@ class EELead(Document):
 			{"message": f"New lead {self.lead_name} — call within {sla_minutes} min", "alert": True},
 			user=allocated_to,
 		)
+		self._email_telecaller_new_lead(settings, allocated_to, sla_minutes)
+
+	def _email_telecaller_new_lead(self, settings, allocated_to, sla_minutes):
+		"""Send email to telecaller about new lead assignment."""
+		template_name = settings.get("new_lead_email_template")
+
+		if template_name:
+			template = frappe.get_doc("Email Template", template_name)
+			context = {"doc": self, "sla_minutes": sla_minutes}
+			message = frappe.render_template(template.response_html or template.response, context)
+			subject = frappe.render_template(template.subject, context)
+		else:
+			subject = f"New Lead Assigned: {self.lead_name}"
+			message = (
+				f"<p>A new lead has been assigned to you.</p>"
+				f"<p><strong>Name:</strong> {self.lead_name}<br>"
+				f"<strong>Email:</strong> {self.email or 'N/A'}<br>"
+				f"<strong>Mobile:</strong> {self.mobile_no or 'N/A'}<br>"
+				f"<strong>Source:</strong> {self.lead_source or 'N/A'}</p>"
+				f"<p>Please make first contact within <strong>{sla_minutes} minutes</strong>.</p>"
+				f"<p><a href='{frappe.utils.get_url()}/app/ee-lead/{self.name}'>View Lead</a></p>"
+			)
+
+		try:
+			frappe.sendmail(
+				recipients=[allocated_to],
+				subject=subject,
+				message=message,
+				reference_doctype="EE Lead",
+				reference_name=self.name,
+			)
+		except Exception:
+			frappe.log_error("Failed to send new lead email to telecaller")
 
 	def _stamp_first_contact(self):
 		"""If call_log has rows and first_contacted_on is empty, stamp it."""
@@ -120,7 +155,7 @@ class EELead(Document):
 			frappe.throw(_("Brochure Email Template not set in ExpertEdge Settings"))
 
 		template = frappe.get_doc("Email Template", settings.brochure_email_template)
-		message = frappe.render_template(template.response_, {"doc": self})
+		message = frappe.render_template(template.response_html or template.response, {"doc": self})
 		subject = frappe.render_template(template.subject, {"doc": self})
 
 		attachments = []
@@ -148,7 +183,7 @@ class EELead(Document):
 			frappe.throw(_("Document Request Email Template not set in ExpertEdge Settings"))
 
 		template = frappe.get_doc("Email Template", settings.doc_request_email_template)
-		message = frappe.render_template(template.response_, {"doc": self})
+		message = frappe.render_template(template.response_html or template.response, {"doc": self})
 		subject = frappe.render_template(template.subject, {"doc": self})
 
 		frappe.sendmail(
@@ -255,6 +290,27 @@ class EELead(Document):
 			indicator="green",
 		)
 		return student.name
+
+	@frappe.whitelist()
+	def set_status(self, status):
+		valid = [
+			"Contacted", "Brochure Sent", "Docs Requested", "Docs Received",
+			"Docs Verified", "Counselling Scheduled", "Counselling Done", "Confirmed",
+		]
+		if status not in valid:
+			frappe.throw(_("Invalid status transition: {0}").format(status))
+		self.status = status
+		self._log_system_activity(f"Status changed to {status}")
+		self.save()
+
+	@frappe.whitelist()
+	def confirm_lead(self):
+		self.status = "Confirmed"
+		self.confirmed_on = now_datetime()
+		self.counselling_outcome = self.counselling_outcome or "Fit \u2013 Confirmed"
+		self._log_system_activity("Lead confirmed — ready for conversion")
+		self.save()
+		frappe.msgprint(_("Lead confirmed. Click 'Convert to Student' to proceed."), indicator="green")
 
 	@frappe.whitelist()
 	def mark_lost(self, lost_reason=None):

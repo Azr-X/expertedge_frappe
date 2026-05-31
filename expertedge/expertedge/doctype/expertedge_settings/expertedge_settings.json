@@ -14,13 +14,9 @@
   "column_break_defaults",
   "billing_currency",
   "deposit_account",
+  "default_receivable_account",
   "default_income_account",
   "service_item",
-  "section_nomod",
-  "nomod_api_base_url",
-  "nomod_api_key",
-  "column_break_nomod",
-  "nomod_service_fee_percent",
   "section_email_templates",
   "brochure_email_template",
   "doc_request_email_template",
@@ -29,6 +25,12 @@
   "payment_receipt_email_template",
   "balance_payment_email_template",
   "welcome_email_template",
+  "payment_link_email_template",
+  "new_lead_email_template",
+  "section_email_recipients",
+  "email_recipients",
+  "section_google_sheet",
+  "google_sheet_url",
   "section_brochure",
   "default_brochure",
   "section_sla",
@@ -43,8 +45,7 @@
    "fieldname": "section_guide",
    "fieldtype": "Section Break",
    "label": "User Guide",
-   "collapsible": 1,
-   "collapsible_depends_on": "eval:!doc.__islocal"
+   "collapsible": 1
   },
   {
    "fieldname": "app_guide",
@@ -94,6 +95,12 @@
    "options": "Account"
   },
   {
+   "fieldname": "default_receivable_account",
+   "fieldtype": "Link",
+   "label": "Default Receivable Account (AED)",
+   "options": "Account"
+  },
+  {
    "fieldname": "default_income_account",
    "fieldtype": "Link",
    "label": "Default Income Account",
@@ -104,30 +111,6 @@
    "fieldtype": "Link",
    "label": "Service Item",
    "options": "Item"
-  },
-  {
-   "fieldname": "section_nomod",
-   "fieldtype": "Section Break",
-   "label": "Nomod"
-  },
-  {
-   "fieldname": "nomod_api_base_url",
-   "fieldtype": "Data",
-   "label": "Nomod API Base URL"
-  },
-  {
-   "fieldname": "nomod_api_key",
-   "fieldtype": "Password",
-   "label": "Nomod API Key"
-  },
-  {
-   "fieldname": "column_break_nomod",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "nomod_service_fee_percent",
-   "fieldtype": "Percent",
-   "label": "Service Fee %"
   },
   {
    "fieldname": "section_email_templates",
@@ -175,6 +158,42 @@
    "options": "Email Template"
   },
   {
+   "fieldname": "payment_link_email_template",
+   "fieldtype": "Link",
+   "label": "Payment Link Email",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "new_lead_email_template",
+   "fieldtype": "Link",
+   "label": "New Lead Notification Email",
+   "options": "Email Template",
+   "description": "Sent to telecaller when a new lead is created"
+  },
+  {
+   "fieldname": "section_email_recipients",
+   "fieldtype": "Section Break",
+   "label": "Email Recipients",
+   "description": "Set which users receive CC/notifications for each email type. If empty, emails go only to the student/lead and handled_by user."
+  },
+  {
+   "fieldname": "email_recipients",
+   "fieldtype": "Table",
+   "label": "Email Recipients",
+   "options": "EE Email Recipient"
+  },
+  {
+   "fieldname": "section_google_sheet",
+   "fieldtype": "Section Break",
+   "label": "Google Sheet Integration"
+  },
+  {
+   "fieldname": "google_sheet_url",
+   "fieldtype": "Data",
+   "label": "Google Sheet URL",
+   "description": "Full URL of the Google Sheet where leads will be synced"
+  },
+  {
    "fieldname": "section_brochure",
    "fieldtype": "Section Break"
   },
@@ -218,7 +237,7 @@
   }
  ],
  "links": [],
- "modified": "2026-05-29 20:19:57.041793",
+ "modified": "2026-05-31 13:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "ExpertEdge Settings",

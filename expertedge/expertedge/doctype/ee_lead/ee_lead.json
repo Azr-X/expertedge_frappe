@@ -51,7 +51,8 @@
   "converted_on",
   "section_conversion",
   "converted",
-  "student"
+  "student",
+  "sheet_lead_id"
  ],
  "fields": [
   {
@@ -334,10 +335,19 @@
    "label": "Student",
    "options": "EE Student",
    "read_only": 1
+  },
+  {
+   "fieldname": "sheet_lead_id",
+   "fieldtype": "Data",
+   "label": "Sheet Lead ID",
+   "read_only": 1,
+   "hidden": 1,
+   "unique": 1,
+   "no_copy": 1
   }
  ],
  "links": [],
- "modified": "2026-05-29 20:19:57.041793",
+ "modified": "2026-05-31 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "EE Lead",

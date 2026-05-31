@@ -7,6 +7,8 @@ app_license = "mit"
 
 required_apps = ["erpnext"]
 
+app_include_css = "/assets/expertedge/css/expertedge.css"
+
 fixtures = [
 	{
 		"dt": "EE Lead Source",
@@ -32,13 +34,23 @@ fixtures = [
 		"dt": "Custom HTML Block",
 		"filters": [["name", "like", "EE -%"]],
 	},
+	{
+		"dt": "Custom DocPerm",
+		"filters": [["role", "in", ["EE Telecaller", "EE Academic Counsellor", "EE Finance", "EE Manager"]]],
+	},
 ]
 
 # Scheduled Tasks
 scheduler_events = {
+	"cron": {
+		"*/15 * * * *": [
+			"expertedge.tasks.sync_google_sheet_leads",
+		],
+	},
 	"hourly": [
 		"expertedge.tasks.check_first_contact_sla",
 		"expertedge.tasks.check_doc_sla",
 		"expertedge.tasks.check_payment_sla",
+		"expertedge.tasks.check_nomod_payments",
 	],
 }

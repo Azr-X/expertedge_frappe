@@ -1,0 +1,185 @@
+{
+ "actions": [],
+ "creation": "2026-05-30 14:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "issingle": 1,
+ "field_order": [
+  "section_api",
+  "enabled",
+  "api_base_url",
+  "api_key",
+  "column_break_api",
+  "test_mode",
+  "test_api_key",
+  "section_defaults",
+  "default_currency",
+  "allow_service_fee",
+  "service_fee_method",
+  "column_break_defaults",
+  "allow_tabby",
+  "allow_tamara",
+  "section_links",
+  "default_success_url",
+  "default_failure_url",
+  "column_break_links",
+  "payment_expiry_days",
+  "section_webhook",
+  "webhook_secret",
+  "webhook_url_info"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_api",
+   "fieldtype": "Section Break",
+   "label": "API Configuration"
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enable Nomod Integration",
+   "description": "When disabled, payment links will use placeholder URLs"
+  },
+  {
+   "fieldname": "api_base_url",
+   "fieldtype": "Data",
+   "label": "API Base URL",
+   "default": "https://api.nomod.com/v1",
+   "reqd": 0,
+   "description": "Default: https://api.nomod.com/v1"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Password",
+   "label": "Live API Key",
+   "description": "From Nomod App > Settings > Business > Connect apps > Create API Key"
+  },
+  {
+   "fieldname": "column_break_api",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "test_mode",
+   "fieldtype": "Check",
+   "label": "Test Mode",
+   "description": "Use test API key instead of live key"
+  },
+  {
+   "fieldname": "test_api_key",
+   "fieldtype": "Password",
+   "label": "Test API Key",
+   "depends_on": "test_mode"
+  },
+  {
+   "fieldname": "section_defaults",
+   "fieldtype": "Section Break",
+   "label": "Payment Defaults"
+  },
+  {
+   "fieldname": "default_currency",
+   "fieldtype": "Data",
+   "label": "Default Currency",
+   "default": "AED",
+   "description": "ISO 4217 currency code (e.g. AED, SAR, USD)"
+  },
+  {
+   "fieldname": "allow_service_fee",
+   "fieldtype": "Check",
+   "label": "Allow Service Fee",
+   "default": "1",
+   "description": "Pass Nomod processing fee to customer"
+  },
+  {
+   "fieldname": "service_fee_method",
+   "fieldtype": "Select",
+   "label": "Service Fee Method",
+   "options": "\nFixed\nPercentage",
+   "depends_on": "allow_service_fee"
+  },
+  {
+   "fieldname": "column_break_defaults",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "allow_tabby",
+   "fieldtype": "Check",
+   "label": "Allow Tabby (Buy Now Pay Later)",
+   "default": "0"
+  },
+  {
+   "fieldname": "allow_tamara",
+   "fieldtype": "Check",
+   "label": "Allow Tamara (Buy Now Pay Later)",
+   "default": "0"
+  },
+  {
+   "fieldname": "section_links",
+   "fieldtype": "Section Break",
+   "label": "Link Settings"
+  },
+  {
+   "fieldname": "default_success_url",
+   "fieldtype": "Data",
+   "label": "Success Redirect URL",
+   "description": "Customer redirected here after successful payment (optional)"
+  },
+  {
+   "fieldname": "default_failure_url",
+   "fieldtype": "Data",
+   "label": "Failure Redirect URL",
+   "description": "Customer redirected here after failed payment (optional)"
+  },
+  {
+   "fieldname": "column_break_links",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "payment_expiry_days",
+   "fieldtype": "Int",
+   "label": "Link Expiry (days)",
+   "default": "7",
+   "description": "Payment links auto-expire after this many days. 0 = no expiry."
+  },
+  {
+   "fieldname": "section_webhook",
+   "fieldtype": "Section Break",
+   "label": "Webhook"
+  },
+  {
+   "fieldname": "webhook_secret",
+   "fieldtype": "Password",
+   "label": "Webhook Secret",
+   "description": "For verifying webhook signatures (when Nomod supports it)"
+  },
+  {
+   "fieldname": "webhook_url_info",
+   "fieldtype": "HTML",
+   "label": "Webhook URL",
+   "options": "<div style='padding:8px 12px;background:var(--control-bg);border-radius:4px;font-family:monospace;font-size:13px;margin-top:4px;'>POST /api/method/expertedge.api.nomod_webhook.handle</div><p style='font-size:12px;color:var(--text-muted);margin-top:6px;'>Configure this URL in your Nomod dashboard to receive payment notifications automatically.</p>"
+  }
+ ],
+ "links": [],
+ "modified": "2026-05-30 20:14:00.992767",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "Nomod Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "EE Manager",
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

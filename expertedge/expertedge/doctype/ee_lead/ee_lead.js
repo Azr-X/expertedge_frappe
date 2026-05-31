@@ -2,40 +2,40 @@ frappe.ui.form.on("EE Lead", {
 	refresh(frm) {
 		if (frm.is_new()) return;
 
-		// Send Brochure
-		if (!frm.doc.converted && frm.doc.status !== "Lost") {
+		const active = !frm.doc.converted && frm.doc.status !== "Lost" && frm.doc.status !== "Converted";
+
+		if (active) {
 			frm.add_custom_button(__("Send Brochure"), function () {
-				frm.call("send_brochure").then(() => frm.reload_doc());
+				frappe.confirm(
+					__("Send brochure email to {0}?", [frm.doc.email]),
+					function () {
+						frm.call("send_brochure").then(() => frm.reload_doc());
+					}
+				);
 			}, __("Actions"));
-		}
 
-		// Request Documents
-		if (!frm.doc.converted && frm.doc.status !== "Lost") {
 			frm.add_custom_button(__("Request Documents"), function () {
-				frm.call("request_documents").then(() => frm.reload_doc());
+				frappe.confirm(
+					__("Send document request email to {0}?", [frm.doc.email]),
+					function () {
+						frm.call("request_documents").then(() => frm.reload_doc());
+					}
+				);
 			}, __("Actions"));
-		}
 
-		// Mark Documents Verified
-		if (!frm.doc.converted && !frm.doc.documents_verified && frm.doc.status !== "Lost") {
 			frm.add_custom_button(__("Mark Documents Verified"), function () {
 				frm.call("mark_documents_verified").then(() => frm.reload_doc());
 			}, __("Actions"));
-		}
 
-		// Convert to Student
-		if (frm.doc.status === "Confirmed" && !frm.doc.converted) {
-			frm.add_custom_button(__("Convert to Student"), function () {
-				frm.call("convert_to_student").then((r) => {
-					if (r && r.message) {
-						frm.reload_doc();
+			frm.add_custom_button(__("Confirm Lead"), function () {
+				frappe.confirm(
+					__("Confirm this lead as Fit and ready for conversion?"),
+					function () {
+						frm.call("confirm_lead").then(() => frm.reload_doc());
 					}
-				});
-			}).addClass("btn-primary");
-		}
+				);
+			}, __("Actions"));
 
-		// Mark Lost
-		if (!frm.doc.converted && frm.doc.status !== "Lost" && frm.doc.status !== "Converted") {
 			frm.add_custom_button(__("Mark Lost"), function () {
 				frappe.prompt(
 					{ fieldname: "lost_reason", fieldtype: "Small Text", label: "Lost Reason", reqd: 1 },
@@ -48,6 +48,17 @@ frappe.ui.form.on("EE Lead", {
 					__("Confirm")
 				);
 			}, __("Actions"));
+		}
+
+		// Convert to Student — primary button when Confirmed
+		if (frm.doc.status === "Confirmed" && !frm.doc.converted) {
+			frm.add_custom_button(__("Convert to Student"), function () {
+				frm.call("convert_to_student").then((r) => {
+					if (r && r.message) {
+						frm.reload_doc();
+					}
+				});
+			}).addClass("btn-primary");
 		}
 
 		// Show link to student if converted

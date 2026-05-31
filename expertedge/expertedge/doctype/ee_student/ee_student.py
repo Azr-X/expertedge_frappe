@@ -8,6 +8,7 @@ class EEStudent(Document):
 	def validate(self):
 		self._resolve_fees()
 		self._compute_net_fee()
+		self._compute_aud_amount()
 		self._recompute_outstanding()
 		self._ensure_follow_up_todos()
 
@@ -40,6 +41,10 @@ class EEStudent(Document):
 			self.net_fee = flt(self.total_fee) * (1 - discount_pct / 100)
 		else:
 			self.net_fee = flt(self.total_fee)
+
+	def _compute_aud_amount(self):
+		rate = flt(self.aud_conversion_rate) or 2.65
+		self.aud_amount = flt(self.net_fee) / rate if rate > 0 else 0
 
 	def _recompute_outstanding(self):
 		self.outstanding = flt(self.net_fee) - flt(self.total_paid)
@@ -88,8 +93,14 @@ class EEStudent(Document):
 		})
 
 	@frappe.whitelist()
-	def create_customer_and_invoice(self):
-		"""Create Customer + submitted Sales Invoice. Idempotent."""
+	def create_customer_and_invoice(self, total_fee=None, apply_discount=None, aud_conversion_rate=None):
+		"""Create Customer + submitted Sales Invoice. Idempotent.
+
+		Args:
+			total_fee: Override fee amount (from dialog). If None, uses self.net_fee.
+			apply_discount: Whether to apply lump-sum discount.
+			aud_conversion_rate: AED to AUD conversion rate.
+		"""
 		if self.sales_invoice:
 			return self.sales_invoice
 
@@ -98,6 +109,21 @@ class EEStudent(Document):
 			frappe.throw(_("Default Company not set in ExpertEdge Settings"))
 		if not settings.service_item:
 			frappe.throw(_("Service Item not set in ExpertEdge Settings"))
+
+		# Update fee on student if provided from dialog
+		if total_fee is not None:
+			self.total_fee = flt(total_fee)
+		if apply_discount is not None:
+			self.apply_lumpsum_discount = int(apply_discount)
+		if aud_conversion_rate is not None:
+			self.aud_conversion_rate = flt(aud_conversion_rate) or 2.65
+		self._compute_net_fee()
+		self._compute_aud_amount()
+		self._recompute_outstanding()
+
+		invoice_amount = flt(self.net_fee)
+		if not invoice_amount:
+			frappe.throw(_("Fee amount cannot be zero"))
 
 		# Create Customer if needed
 		if not self.customer:
@@ -112,59 +138,46 @@ class EEStudent(Document):
 			self.customer = customer.name
 
 		# Create Sales Invoice
-		si = frappe.get_doc({
+		si_data = {
 			"doctype": "Sales Invoice",
 			"customer": self.customer,
 			"company": settings.default_company,
 			"currency": self.billing_currency or "AED",
-			"conversion_rate": 1,  # ERPNext will fetch the actual rate
+			"conversion_rate": 1,
 			"items": [{
 				"item_code": settings.service_item,
 				"qty": 1,
-				"rate": flt(self.net_fee),
+				"rate": invoice_amount,
 				"income_account": settings.default_income_account,
 			}],
-		})
+		}
+		if settings.default_receivable_account:
+			si_data["debit_to"] = settings.default_receivable_account
+		si = frappe.get_doc(si_data)
 		si.insert(ignore_permissions=True)
 		si.submit()
 
 		self.sales_invoice = si.name
-		self._log_system_activity(f"Customer {self.customer} and Invoice {si.name} created")
+		self._log_system_activity(f"Customer {self.customer} and Invoice {si.name} created (AED {invoice_amount})")
 		self.save(ignore_permissions=True)
 		return si.name
 
 	@frappe.whitelist()
-	def generate_pre_approval_link(self):
+	def create_payment_link(self, purpose, amount, currency=None, remarks=None):
+		"""Create a payment link with flexible purpose/amount/currency."""
 		self._ensure_invoice_exists()
 		link = frappe.get_doc({
 			"doctype": "EE Nomod Payment Link",
 			"student": self.name,
-			"purpose": "Pre-Approval",
-			"amount": flt(self.pre_approval_fee),
-			"currency": self.billing_currency or "AED",
+			"purpose": purpose,
+			"amount": flt(amount),
+			"currency": currency or self.billing_currency or "AED",
 			"sales_invoice": self.sales_invoice,
+			"remarks": remarks,
 		})
 		link.insert(ignore_permissions=True)
 		link.generate_nomod_link()
-		self._log_system_activity(f"Pre-approval payment link {link.name} generated")
-		self.save(ignore_permissions=True)
-		return link.name
-
-	@frappe.whitelist()
-	def generate_balance_link(self):
-		self._ensure_invoice_exists()
-		self._recompute_outstanding()
-		link = frappe.get_doc({
-			"doctype": "EE Nomod Payment Link",
-			"student": self.name,
-			"purpose": "Balance",
-			"amount": flt(self.outstanding),
-			"currency": self.billing_currency or "AED",
-			"sales_invoice": self.sales_invoice,
-		})
-		link.insert(ignore_permissions=True)
-		link.generate_nomod_link()
-		self._log_system_activity(f"Balance payment link {link.name} generated")
+		self._log_system_activity(f"Payment link {link.name} generated — {purpose} {currency or 'AED'} {flt(amount)}")
 		self.save(ignore_permissions=True)
 		return link.name
 
@@ -195,7 +208,7 @@ class EEStudent(Document):
 			frappe.throw(_("Email template '{0}' not set in ExpertEdge Settings").format(template_field))
 
 		template = frappe.get_doc("Email Template", template_name)
-		message = frappe.render_template(template.response_, {"doc": self})
+		message = frappe.render_template(template.response_html or template.response, {"doc": self})
 		subject = frappe.render_template(template.subject, {"doc": self})
 
 		frappe.sendmail(

@@ -1,0 +1,24 @@
+/* ExpertEdge Workspace — compact cards */
+.workspace-container .widget.shortcut-widget-box {
+	padding: 8px 12px;
+	min-height: unset;
+}
+.workspace-container .widget.shortcut-widget-box .widget-head {
+	margin-bottom: 0;
+}
+.workspace-container .widget.shortcut-widget-box .shortcut-widget-title {
+	font-size: 13px;
+}
+.workspace-container .widget.shortcut-widget-box .indicator-pill {
+	font-size: 11px;
+	padding: 2px 8px;
+}
+.workspace-container .widget.links-widget-box {
+	padding: 10px 14px;
+}
+.workspace-container .widget.links-widget-box .widget-head {
+	margin-bottom: 6px;
+}
+.workspace-container .widget.links-widget-box .link-item {
+	padding: 4px 0;
+}

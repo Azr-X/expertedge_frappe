@@ -2,65 +2,54 @@ frappe.ui.form.on("EE Student", {
 	refresh(frm) {
 		if (frm.is_new()) return;
 
-		// Create Customer & Invoice
-		if (!frm.doc.sales_invoice) {
-			frm.add_custom_button(__("Create Customer & Invoice"), function () {
-				frm.call("create_customer_and_invoice").then(() => frm.reload_doc());
-			}, __("Billing"));
-		}
-
-		// Generate Pre-Approval Link
-		if (frm.doc.status === "Pre-Approval Pending") {
-			frm.add_custom_button(__("Generate Pre-Approval Link"), function () {
-				frm.call("generate_pre_approval_link").then((r) => {
-					if (r && r.message) {
-						frappe.msgprint(__("Payment link created: {0}", [r.message]));
-						frm.reload_doc();
-					}
-				});
-			}, __("Billing"));
-		}
-
-		// Generate Balance Link
-		if (["Balance Pending", "CMA Registered"].includes(frm.doc.status) && frm.doc.outstanding > 0) {
-			frm.add_custom_button(__("Generate Balance Link"), function () {
-				frm.call("generate_balance_link").then((r) => {
-					if (r && r.message) {
-						frappe.msgprint(__("Balance link created: {0}", [r.message]));
-						frm.reload_doc();
-					}
-				});
-			}, __("Billing"));
-		}
-
-		// Email buttons
 		if (frm.doc.status !== "Dropped") {
+			// Create Customer & Invoice — dialog with fee input
+			if (!frm.doc.sales_invoice) {
+				frm.add_custom_button(__("Create Customer & Invoice"), function () {
+					_show_invoice_dialog(frm);
+				}, __("Billing"));
+			}
+
+			// Create Payment Link
+			frm.add_custom_button(__("Create Payment Link"), function () {
+				if (!frm.doc.sales_invoice) {
+					_show_invoice_dialog(frm, true);
+					return;
+				}
+				_show_payment_link_dialog(frm);
+			}, __("Billing"));
+
+			// Email buttons (all with confirmation)
 			frm.add_custom_button(__("Send Pre-Approval Email"), function () {
-				frm.call("send_pre_approval_email").then(() => frm.reload_doc());
+				frappe.confirm(__("Send pre-approval email to {0}?", [frm.doc.email]), function () {
+					frm.call("send_pre_approval_email").then(() => frm.reload_doc());
+				});
 			}, __("Email"));
 
 			frm.add_custom_button(__("Send Receipt"), function () {
-				frm.call("send_receipt_email").then(() => frm.reload_doc());
+				frappe.confirm(__("Send payment receipt email to {0}?", [frm.doc.email]), function () {
+					frm.call("send_receipt_email").then(() => frm.reload_doc());
+				});
 			}, __("Email"));
 
 			frm.add_custom_button(__("Send Balance Email"), function () {
-				frm.call("send_balance_email").then(() => frm.reload_doc());
+				frappe.confirm(__("Send balance payment email to {0}?", [frm.doc.email]), function () {
+					frm.call("send_balance_email").then(() => frm.reload_doc());
+				});
 			}, __("Email"));
 
 			frm.add_custom_button(__("Send Welcome Email"), function () {
-				frm.call("send_welcome_email").then(() => frm.reload_doc());
+				frappe.confirm(__("Send welcome email to {0}?", [frm.doc.email]), function () {
+					frm.call("send_welcome_email").then(() => frm.reload_doc());
+				});
 			}, __("Email"));
-		}
 
-		// Mark CMA Registered
-		if (["Pre-Approval Paid", "CMA Registration"].includes(frm.doc.status)) {
+			// Mark CMA Registered
 			frm.add_custom_button(__("Mark CMA Registered"), function () {
 				frm.call("mark_cma_registered").then(() => frm.reload_doc());
 			}, __("Actions"));
-		}
 
-		// Issue Materials
-		if (frm.doc.status === "Enrolled") {
+			// Issue Materials
 			frm.add_custom_button(__("Issue Materials"), function () {
 				frm.call("issue_materials").then(() => frm.reload_doc());
 			}, __("Actions"));
@@ -73,5 +62,187 @@ frappe.ui.form.on("EE Student", {
 				"blue"
 			);
 		}
+
+		// Dashboard connections — Customer, Sales Invoice, Payment Entries
+		if (frm.doc.customer) {
+			frm.dashboard.add_indicator(
+				__('<a href="/app/customer/{0}">{0}</a>', [frm.doc.customer]),
+				"blue"
+			);
+		}
+		if (frm.doc.sales_invoice) {
+			frm.dashboard.add_indicator(
+				__('<a href="/app/sales-invoice/{0}">Invoice: {0}</a>', [frm.doc.sales_invoice]),
+				"green"
+			);
+		}
+		// Show payment entries from linked payment links
+		if (!frm.is_new()) {
+			frappe.call({
+				method: "frappe.client.get_list",
+				args: {
+					doctype: "EE Nomod Payment Link",
+					filters: { student: frm.doc.name, status: "Paid" },
+					fields: ["name", "payment_entry", "amount", "purpose"],
+				},
+				async: false,
+				callback: function (r) {
+					if (r.message) {
+						r.message.forEach(function (link) {
+							if (link.payment_entry) {
+								frm.dashboard.add_indicator(
+									__('<a href="/app/payment-entry/{0}">PE: {0} ({1} {2})</a>',
+										[link.payment_entry, link.purpose, link.amount]),
+									"orange"
+								);
+							}
+						});
+					}
+				},
+			});
+		}
 	},
 });
+
+function _show_invoice_dialog(frm, open_payment_link_after) {
+	var d = new frappe.ui.Dialog({
+		title: __("Create Customer & Sales Invoice"),
+		fields: [
+			{
+				fieldname: "total_fee",
+				fieldtype: "Currency",
+				label: "Total Fee (AED)",
+				default: frm.doc.net_fee || frm.doc.total_fee || 3500,
+				reqd: 1,
+				description: "This will be the invoice amount. Adjust per student if needed.",
+			},
+			{
+				fieldname: "apply_lumpsum_discount",
+				fieldtype: "Check",
+				label: "Apply Lump-sum Discount (5%)",
+				default: frm.doc.apply_lumpsum_discount || 0,
+			},
+			{
+				fieldname: "net_fee_display",
+				fieldtype: "Currency",
+				label: "Net Fee (after discount)",
+				read_only: 1,
+				default: frm.doc.net_fee || frm.doc.total_fee || 3500,
+			},
+			{
+				fieldtype: "Section Break",
+				label: "AUD Equivalent",
+			},
+			{
+				fieldname: "aud_conversion_rate",
+				fieldtype: "Float",
+				label: "AED to AUD Conversion Rate",
+				default: 2.65,
+				precision: 4,
+				reqd: 1,
+				description: "1 AUD = X AED. Default 2.65",
+			},
+			{
+				fieldname: "aud_amount",
+				fieldtype: "Currency",
+				label: "AUD Amount",
+				read_only: 1,
+				options: "AUD",
+			},
+		],
+		primary_action_label: __("Create"),
+		primary_action: function (values) {
+			d.hide();
+			frm.call("create_customer_and_invoice", {
+				total_fee: values.total_fee,
+				apply_discount: values.apply_lumpsum_discount,
+				aud_conversion_rate: values.aud_conversion_rate,
+			}).then(() => {
+				frm.reload_doc();
+				if (open_payment_link_after) {
+					frappe.show_alert({
+						message: __("Invoice created. Now create the payment link."),
+						indicator: "green",
+					});
+				}
+			});
+		},
+	});
+
+	// Recalculate net fee and AUD on changes
+	function recalc() {
+		var fee = d.get_value("total_fee") || 0;
+		var disc = d.get_value("apply_lumpsum_discount");
+		var net = disc ? fee * 0.95 : fee;
+		d.set_value("net_fee_display", net);
+
+		var rate = d.get_value("aud_conversion_rate") || 2.65;
+		d.set_value("aud_amount", rate > 0 ? net / rate : 0);
+	}
+	d.fields_dict.total_fee.$input.on("change", recalc);
+	d.fields_dict.apply_lumpsum_discount.$input.on("change", recalc);
+	d.fields_dict.aud_conversion_rate.$input.on("change", recalc);
+	recalc();
+	d.show();
+}
+
+function _show_payment_link_dialog(frm) {
+	var d = new frappe.ui.Dialog({
+		title: __("Create Payment Link"),
+		fields: [
+			{
+				fieldname: "purpose",
+				fieldtype: "Select",
+				label: "Purpose",
+				options: "Pre-Approval\nBalance\nPartial\nFull Payment\nOther",
+				default: frm.doc.status === "Pre-Approval Pending" ? "Pre-Approval" : "Balance",
+				reqd: 1,
+			},
+			{
+				fieldname: "amount",
+				fieldtype: "Currency",
+				label: "Amount",
+				default: frm.doc.status === "Pre-Approval Pending"
+					? frm.doc.pre_approval_fee
+					: frm.doc.outstanding,
+				reqd: 1,
+			},
+			{
+				fieldname: "currency",
+				fieldtype: "Link",
+				label: "Currency",
+				options: "Currency",
+				default: frm.doc.billing_currency || "AED",
+				reqd: 1,
+			},
+			{
+				fieldname: "remarks",
+				fieldtype: "Small Text",
+				label: "Remarks",
+			},
+		],
+		primary_action_label: __("Generate"),
+		primary_action: function (values) {
+			d.hide();
+			frm.call("create_payment_link", values).then((r) => {
+				if (r && r.message) {
+					frappe.msgprint(
+						__("Payment link created: <a href='/app/ee-nomod-payment-link/{0}'>{0}</a>", [r.message])
+					);
+					frm.reload_doc();
+				}
+			});
+		},
+	});
+	d.fields_dict.purpose.$input.on("change", function () {
+		var purpose = d.get_value("purpose");
+		if (purpose === "Pre-Approval") {
+			d.set_value("amount", frm.doc.pre_approval_fee || 200);
+		} else if (purpose === "Balance") {
+			d.set_value("amount", frm.doc.outstanding || 0);
+		} else if (purpose === "Full Payment") {
+			d.set_value("amount", frm.doc.net_fee || 0);
+		}
+	});
+	d.show();
+}
