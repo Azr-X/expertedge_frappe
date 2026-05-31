@@ -13,31 +13,22 @@ class EEStudent(Document):
 		self._ensure_follow_up_todos()
 
 	def _resolve_fees(self):
-		"""Resolve total_fee from Batch (override) or Program."""
+		"""Resolve fees from Batch."""
 		settings = frappe.get_cached_doc("ExpertEdge Settings")
 		self.billing_currency = settings.billing_currency or "AED"
 
 		if self.batch:
 			batch = frappe.get_cached_doc("EE Batch", self.batch)
-			if batch.override_fee:
-				self.total_fee = batch.total_fee
-			else:
-				program = frappe.get_cached_doc("EE Program", batch.program)
-				self.total_fee = program.total_fee
+			self.total_fee = batch.total_fee
 			if not self.program:
 				self.program = batch.program
-		elif self.program:
-			program = frappe.get_cached_doc("EE Program", self.program)
-			self.total_fee = program.total_fee
-
-		if self.program and not self.pre_approval_fee:
-			program = frappe.get_cached_doc("EE Program", self.program)
-			self.pre_approval_fee = program.pre_approval_fee
+			if not self.pre_approval_fee:
+				self.pre_approval_fee = batch.pre_approval_fee
 
 	def _compute_net_fee(self):
-		if self.apply_lumpsum_discount and self.program:
-			program = frappe.get_cached_doc("EE Program", self.program)
-			discount_pct = flt(program.lumpsum_discount_percent)
+		if self.apply_lumpsum_discount and self.batch:
+			batch = frappe.get_cached_doc("EE Batch", self.batch)
+			discount_pct = flt(batch.lumpsum_discount_percent)
 			self.net_fee = flt(self.total_fee) * (1 - discount_pct / 100)
 		else:
 			self.net_fee = flt(self.total_fee)

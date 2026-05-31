@@ -9,14 +9,9 @@
   "program_code",
   "partner",
   "column_break_1",
-  "currency",
-  "total_fee",
-  "lumpsum_discount_percent",
-  "pre_approval_fee",
+  "is_active",
   "section_break_desc",
-  "description",
-  "section_break_settings",
-  "is_active"
+  "description"
  ],
  "fields": [
   {
@@ -43,32 +38,10 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "currency",
-   "fieldtype": "Link",
-   "label": "Currency",
-   "options": "Currency",
-   "default": "AED",
-   "reqd": 1
-  },
-  {
-   "fieldname": "total_fee",
-   "fieldtype": "Currency",
-   "label": "Total Fee",
-   "default": "3500",
-   "options": "currency"
-  },
-  {
-   "fieldname": "lumpsum_discount_percent",
-   "fieldtype": "Percent",
-   "label": "Lump-sum Discount %",
-   "default": "5"
-  },
-  {
-   "fieldname": "pre_approval_fee",
-   "fieldtype": "Currency",
-   "label": "Pre-Approval Fee",
-   "default": "200",
-   "options": "currency"
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Active",
+   "default": "1"
   },
   {
    "fieldname": "section_break_desc",
@@ -79,20 +52,10 @@
    "fieldname": "description",
    "fieldtype": "Text Editor",
    "label": "Description"
-  },
-  {
-   "fieldname": "section_break_settings",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "is_active",
-   "fieldtype": "Check",
-   "label": "Active",
-   "default": "1"
   }
  ],
  "links": [],
- "modified": "2026-05-30 20:14:00.992767",
+ "modified": "2026-06-01 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "EE Program",

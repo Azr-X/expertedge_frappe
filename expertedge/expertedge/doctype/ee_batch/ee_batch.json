@@ -24,9 +24,11 @@
   "capacity",
   "seats_filled",
   "section_break_fee",
-  "override_fee",
+  "currency",
   "total_fee",
-  "currency"
+  "column_break_fee",
+  "lumpsum_discount_percent",
+  "pre_approval_fee"
  ],
  "fields": [
   {
@@ -136,32 +138,43 @@
   {
    "fieldname": "section_break_fee",
    "fieldtype": "Section Break",
-   "label": "Fee Override"
-  },
-  {
-   "fieldname": "override_fee",
-   "fieldtype": "Check",
-   "label": "Override Program Fee"
-  },
-  {
-   "fieldname": "total_fee",
-   "fieldtype": "Currency",
-   "label": "Batch Total Fee",
-   "depends_on": "override_fee",
-   "mandatory_depends_on": "override_fee",
-   "options": "currency"
+   "label": "Fee"
   },
   {
    "fieldname": "currency",
    "fieldtype": "Link",
-   "label": "Batch Currency",
+   "label": "Currency",
    "options": "Currency",
    "default": "AED",
-   "depends_on": "override_fee"
+   "reqd": 1
+  },
+  {
+   "fieldname": "total_fee",
+   "fieldtype": "Currency",
+   "label": "Total Fee",
+   "reqd": 1,
+   "options": "currency"
+  },
+  {
+   "fieldname": "column_break_fee",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "lumpsum_discount_percent",
+   "fieldtype": "Percent",
+   "label": "Lump-sum Discount %",
+   "default": "5"
+  },
+  {
+   "fieldname": "pre_approval_fee",
+   "fieldtype": "Currency",
+   "label": "Pre-Approval Fee",
+   "default": "200",
+   "options": "currency"
   }
  ],
  "links": [],
- "modified": "2026-05-30 20:14:00.992767",
+ "modified": "2026-06-01 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "EE Batch",
