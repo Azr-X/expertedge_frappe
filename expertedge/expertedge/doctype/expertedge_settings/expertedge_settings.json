@@ -31,6 +31,14 @@
   "email_recipients",
   "section_google_sheet",
   "google_sheet_url",
+  "section_r2",
+  "r2_endpoint_url",
+  "r2_bucket",
+  "r2_folder",
+  "column_break_r2",
+  "r2_access_key",
+  "r2_secret_key",
+  "r2_signed_url_expiry",
   "section_brochure",
   "default_brochure",
   "section_sla",
@@ -194,6 +202,49 @@
    "description": "Full URL of the Google Sheet where leads will be synced"
   },
   {
+   "fieldname": "section_r2",
+   "fieldtype": "Section Break",
+   "label": "Cloudflare R2 / S3 Storage",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "r2_endpoint_url",
+   "fieldtype": "Data",
+   "label": "Endpoint URL",
+   "description": "e.g. https://ACCOUNT_ID.r2.cloudflarestorage.com"
+  },
+  {
+   "fieldname": "r2_bucket",
+   "fieldtype": "Data",
+   "label": "Bucket Name"
+  },
+  {
+   "fieldname": "r2_folder",
+   "fieldtype": "Data",
+   "label": "Folder Prefix",
+   "description": "Optional prefix for all uploads"
+  },
+  {
+   "fieldname": "column_break_r2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "r2_access_key",
+   "fieldtype": "Data",
+   "label": "Access Key ID"
+  },
+  {
+   "fieldname": "r2_secret_key",
+   "fieldtype": "Password",
+   "label": "Secret Access Key"
+  },
+  {
+   "fieldname": "r2_signed_url_expiry",
+   "fieldtype": "Int",
+   "label": "Signed URL Expiry (seconds)",
+   "default": "3600"
+  },
+  {
    "fieldname": "section_brochure",
    "fieldtype": "Section Break"
   },
@@ -237,7 +288,7 @@
   }
  ],
  "links": [],
- "modified": "2026-05-31 13:00:00.000000",
+ "modified": "2026-06-02 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "ExpertEdge Settings",

@@ -40,6 +40,14 @@ fixtures = [
 	},
 ]
 
+# Cloudflare R2 file storage
+doc_events = {
+	"File": {
+		"after_insert": "expertedge.r2_storage.file_upload_to_r2",
+		"on_trash": "expertedge.r2_storage.delete_from_r2",
+	},
+}
+
 # Scheduled Tasks
 scheduler_events = {
 	"cron": {
