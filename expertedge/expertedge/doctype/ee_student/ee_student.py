@@ -17,7 +17,8 @@ class EEStudent(Document):
 		self._compute_net_fee()
 		self._compute_aud_amount()
 		self._recompute_outstanding()
-		self._ensure_follow_up_todos()
+		if not self.is_new():
+			self._ensure_follow_up_todos()
 
 	def _auto_disable_web_edit(self):
 		"""Auto-disable web edit after guest submits the form."""
