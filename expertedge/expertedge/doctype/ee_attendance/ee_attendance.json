@@ -1,0 +1,175 @@
+{
+ "actions": [],
+ "allow_copy": 0,
+ "allow_rename": 0,
+ "autoname": "format:ATT-{employee}-{####}",
+ "creation": "2026-06-03 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "column_break_1",
+  "attendance_date",
+  "status",
+  "section_break_checkin",
+  "check_in",
+  "column_break_2",
+  "check_out",
+  "section_break_hours",
+  "total_hours",
+  "column_break_3",
+  "auto_checked_out",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "set_only_once": 1,
+   "default": "__user"
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Full Name",
+   "read_only": 1,
+   "fetch_from": "employee.full_name"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attendance_date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "set_only_once": 1,
+   "default": "Today"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Checked In\nChecked Out",
+   "default": "Checked In",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_checkin",
+   "fieldtype": "Section Break",
+   "label": "Time Details"
+  },
+  {
+   "fieldname": "check_in",
+   "fieldtype": "Datetime",
+   "label": "Check In",
+   "reqd": 1,
+   "in_list_view": 1,
+   "set_only_once": 1,
+   "default": "Now"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "check_out",
+   "fieldtype": "Datetime",
+   "label": "Check Out",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_hours",
+   "fieldtype": "Section Break",
+   "label": "Summary"
+  },
+  {
+   "fieldname": "total_hours",
+   "fieldtype": "Float",
+   "label": "Total Hours",
+   "read_only": 1,
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "auto_checked_out",
+   "fieldtype": "Check",
+   "label": "Auto Checked Out",
+   "read_only": 1,
+   "default": "0"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "EE Attendance",
+   "read_only": 1,
+   "no_copy": 1,
+   "hidden": 1
+  }
+ ],
+ "in_create": 1,
+ "is_submittable": 0,
+ "links": [],
+ "modified": "2026-06-03 18:06:38.119046",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "EE Attendance",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "read": 1,
+   "write": 0,
+   "delete": 0,
+   "role": "System Manager"
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "write": 0,
+   "delete": 0,
+   "role": "EE Telecaller"
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "write": 0,
+   "delete": 0,
+   "role": "EE Academic Counsellor"
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "write": 0,
+   "delete": 0,
+   "role": "EE Finance"
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "write": 0,
+   "delete": 0,
+   "role": "EE Manager"
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}

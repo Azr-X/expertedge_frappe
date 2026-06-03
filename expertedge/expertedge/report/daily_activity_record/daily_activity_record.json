@@ -1,0 +1,46 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2026-06-03 10:00:00.000000",
+ "disabled": 0,
+ "doctype": "Report",
+ "filters": [
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date",
+   "mandatory": 1,
+   "default": "Today"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date",
+   "mandatory": 1,
+   "default": "Today"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User"
+  }
+ ],
+ "is_standard": "Yes",
+ "modified": "2026-06-03 18:06:38.119046",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "Daily Activity Record",
+ "owner": "Administrator",
+ "ref_doctype": "EE Attendance",
+ "report_name": "Daily Activity Record",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "EE Manager"
+  }
+ ]
+}

@@ -51,6 +51,9 @@ scheduler_events = {
 		"*/15 * * * *": [
 			"expertedge.tasks.sync_google_sheet_leads",
 		],
+		"55 23 * * *": [
+			"expertedge.expertedge.doctype.ee_attendance.ee_attendance.auto_checkout_all",
+		],
 	},
 	"hourly": [
 		"expertedge.tasks.check_first_contact_sla",
