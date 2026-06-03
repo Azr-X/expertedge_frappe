@@ -121,16 +121,37 @@ frappe.ui.form.on("EE Student", {
 });
 
 function _show_invoice_dialog(frm, open_payment_link_after) {
+	// Compute default AUD from existing fee if available
+	var existing_rate = frm.doc.aud_conversion_rate || 2.65;
+	var existing_aed = frm.doc.net_fee || frm.doc.total_fee || 0;
+	var default_aud = existing_aed && existing_rate > 0 ? existing_aed / existing_rate : 1320;
+
 	var d = new frappe.ui.Dialog({
 		title: __("Create Customer & Sales Invoice"),
 		fields: [
 			{
+				fieldname: "aud_amount",
+				fieldtype: "Currency",
+				label: "Program Fee (AUD)",
+				default: default_aud,
+				reqd: 1,
+				description: "Enter the fee in AUD. AED amount will be computed.",
+			},
+			{
+				fieldname: "aud_conversion_rate",
+				fieldtype: "Float",
+				label: "AUD → AED Conversion Rate",
+				default: existing_rate,
+				precision: 4,
+				reqd: 1,
+				description: "1 AUD = X AED",
+			},
+			{
 				fieldname: "total_fee",
 				fieldtype: "Currency",
 				label: "Total Fee (AED)",
-				default: frm.doc.net_fee || frm.doc.total_fee || 3500,
-				reqd: 1,
-				description: "This will be the invoice amount. Adjust per student if needed.",
+				read_only: 1,
+				description: "Auto-calculated: AUD × Rate",
 			},
 			{
 				fieldname: "apply_lumpsum_discount",
@@ -141,36 +162,16 @@ function _show_invoice_dialog(frm, open_payment_link_after) {
 			{
 				fieldname: "net_fee_display",
 				fieldtype: "Currency",
-				label: "Net Fee (after discount)",
+				label: "Net Invoice Amount (AED)",
 				read_only: 1,
-				default: frm.doc.net_fee || frm.doc.total_fee || 3500,
-			},
-			{
-				fieldtype: "Section Break",
-				label: "AUD Equivalent",
-			},
-			{
-				fieldname: "aud_conversion_rate",
-				fieldtype: "Float",
-				label: "AED to AUD Conversion Rate",
-				default: 2.65,
-				precision: 4,
-				reqd: 1,
-				description: "1 AUD = X AED. Default 2.65",
-			},
-			{
-				fieldname: "aud_amount",
-				fieldtype: "Currency",
-				label: "AUD Amount",
-				read_only: 1,
-				options: "AUD",
+				bold: 1,
 			},
 		],
 		primary_action_label: __("Create"),
 		primary_action: function (values) {
 			d.hide();
 			frm.call("create_customer_and_invoice", {
-				total_fee: values.total_fee,
+				total_fee: d.get_value("total_fee"),
 				apply_discount: values.apply_lumpsum_discount,
 				aud_conversion_rate: values.aud_conversion_rate,
 			}).then(() => {
@@ -185,19 +186,39 @@ function _show_invoice_dialog(frm, open_payment_link_after) {
 		},
 	});
 
-	// Recalculate net fee and AUD on changes
 	function recalc() {
-		var fee = d.get_value("total_fee") || 0;
-		var disc = d.get_value("apply_lumpsum_discount");
-		var net = disc ? fee * 0.95 : fee;
-		d.set_value("net_fee_display", net);
-
+		var aud = d.get_value("aud_amount") || 0;
 		var rate = d.get_value("aud_conversion_rate") || 2.65;
-		d.set_value("aud_amount", rate > 0 ? net / rate : 0);
+		var aed = flt(aud * rate, 2);
+		d.set_value("total_fee", aed);
+
+		var disc = d.get_value("apply_lumpsum_discount");
+		var net = disc ? flt(aed * 0.95, 2) : aed;
+		d.set_value("net_fee_display", net);
 	}
-	d.fields_dict.total_fee.$input.on("change", recalc);
-	d.fields_dict.apply_lumpsum_discount.$input.on("change", recalc);
+	d.fields_dict.aud_amount.$input.on("change", recalc);
 	d.fields_dict.aud_conversion_rate.$input.on("change", recalc);
+	d.fields_dict.apply_lumpsum_discount.$input.on("change", recalc);
+
+	// Fetch latest AUD→AED rate from Currency Exchange
+	frappe.call({
+		method: "frappe.client.get_list",
+		args: {
+			doctype: "Currency Exchange",
+			filters: { from_currency: "AUD", to_currency: "AED" },
+			fields: ["exchange_rate"],
+			order_by: "date desc",
+			limit_page_length: 1,
+		},
+		async: false,
+		callback: function (r) {
+			if (r.message && r.message.length) {
+				d.set_value("aud_conversion_rate", r.message[0].exchange_rate);
+			}
+		},
+	});
+
+	recalc();
 	recalc();
 	d.show();
 }
