@@ -27,8 +27,29 @@ class EELead(Document):
 	def validate(self):
 		if not self.handled_by and frappe.session.user != "Guest":
 			self.handled_by = frappe.session.user
+		self._guard_converted_status()
 		self._stamp_first_contact()
 		self._ensure_follow_up_todos()
+
+	def _guard_converted_status(self):
+		"""Prevent manual status change to Converted or Lost — must use buttons."""
+		if self.is_new():
+			return
+		db_status = frappe.db.get_value("EE Lead", self.name, "status")
+		if db_status == self.status:
+			return
+		guarded = {
+			"Converted": ("in_lead_conversion", "Convert to Student"),
+			"Lost": ("in_lead_mark_lost", "Mark Lost"),
+			"Confirmed": ("in_lead_confirm", "Confirm Lead"),
+			"Brochure Sent": ("in_lead_send_brochure", "Send Brochure"),
+			"Docs Requested": ("in_lead_request_docs", "Request Documents"),
+			"Docs Verified": ("in_lead_verify_docs", "Mark Documents Verified"),
+		}
+		if self.status in guarded:
+			flag, button = guarded[self.status]
+			if not getattr(frappe.flags, flag, False):
+				frappe.throw(_("Cannot manually set status to {0}. Use the '{1}' button.").format(self.status, button))
 
 	def _seed_mandatory_documents(self):
 		"""Pre-seed document rows from active mandatory EE Document Type records."""
@@ -187,7 +208,11 @@ class EELead(Document):
 		self.brochure_sent_on = now_datetime()
 		self.status = "Brochure Sent"
 		self._log_system_activity("Brochure sent to candidate")
-		self.save()
+		frappe.flags.in_lead_send_brochure = True
+		try:
+			self.save()
+		finally:
+			frappe.flags.in_lead_send_brochure = False
 
 	@frappe.whitelist()
 	def request_documents(self):
@@ -210,7 +235,11 @@ class EELead(Document):
 		self.docs_requested_on = now_datetime()
 		self.status = "Docs Requested"
 		self._log_system_activity("Document request email sent")
-		self.save()
+		frappe.flags.in_lead_request_docs = True
+		try:
+			self.save()
+		finally:
+			frappe.flags.in_lead_request_docs = False
 
 	@frappe.whitelist()
 	def mark_documents_verified(self):
@@ -226,7 +255,11 @@ class EELead(Document):
 		self.docs_verified_on = now_datetime()
 		self.status = "Docs Verified"
 		self._log_system_activity("All documents verified")
-		self.save()
+		frappe.flags.in_lead_verify_docs = True
+		try:
+			self.save()
+		finally:
+			frappe.flags.in_lead_verify_docs = False
 
 	@frappe.whitelist()
 	def convert_to_student(self):
@@ -301,7 +334,11 @@ class EELead(Document):
 		self.student = student.name
 		self.status = "Converted"
 		self._log_system_activity(f"Converted to student {student.name}")
-		self.save()
+		frappe.flags.in_lead_conversion = True
+		try:
+			self.save()
+		finally:
+			frappe.flags.in_lead_conversion = False
 
 		frappe.msgprint(
 			_("Student {0} created successfully").format(
@@ -330,7 +367,11 @@ class EELead(Document):
 		self.confirmed_on = now_datetime()
 		self.counselling_outcome = self.counselling_outcome or "Fit \u2013 Confirmed"
 		self._log_system_activity("Lead confirmed — ready for conversion")
-		self.save()
+		frappe.flags.in_lead_confirm = True
+		try:
+			self.save()
+		finally:
+			frappe.flags.in_lead_confirm = False
 		frappe.msgprint(_("Lead confirmed. Click 'Convert to Student' to proceed."), indicator="green")
 
 	@frappe.whitelist()
@@ -339,4 +380,8 @@ class EELead(Document):
 			self.lost_reason = lost_reason
 		self.status = "Lost"
 		self._log_system_activity(f"Marked as Lost. Reason: {self.lost_reason or 'Not specified'}")
-		self.save()
+		frappe.flags.in_lead_mark_lost = True
+		try:
+			self.save()
+		finally:
+			frappe.flags.in_lead_mark_lost = False

@@ -13,12 +13,30 @@ class EEStudent(Document):
 
 	def validate(self):
 		self._auto_disable_web_edit()
+		self._guard_status()
 		self._resolve_fees()
 		self._compute_net_fee()
 		self._compute_aud_amount()
 		self._recompute_outstanding()
 		if not self.is_new():
 			self._ensure_follow_up_todos()
+
+	def _guard_status(self):
+		"""Prevent manual status change for statuses that must be set via buttons."""
+		if self.is_new():
+			return
+		db_status = frappe.db.get_value("EE Student", self.name, "status")
+		if db_status == self.status:
+			return
+		guarded = {
+			"CMA Registered": ("in_student_cma_registered", "Mark CMA Registered"),
+			"Materials Issued": ("in_student_materials_issued", "Issue Materials"),
+			"Fully Paid": ("in_student_fully_paid", "Recalculate Payments"),
+		}
+		if self.status in guarded:
+			flag, button = guarded[self.status]
+			if not getattr(frappe.flags, flag, False):
+				frappe.throw(_("Cannot manually set status to {0}. Use the '{1}' button.").format(self.status, button))
 
 	def _auto_disable_web_edit(self):
 		"""Auto-disable web edit after guest submits the form."""
@@ -232,7 +250,11 @@ class EEStudent(Document):
 		self.cma_registered_on = nowdate()
 		self.status = "CMA Registered"
 		self._log_system_activity("CMA registration confirmed")
-		self.save()
+		frappe.flags.in_student_cma_registered = True
+		try:
+			self.save()
+		finally:
+			frappe.flags.in_student_cma_registered = False
 
 	@frappe.whitelist()
 	def issue_materials(self):
@@ -240,7 +262,11 @@ class EEStudent(Document):
 		self.materials_issued_on = nowdate()
 		self.status = "Materials Issued"
 		self._log_system_activity("Materials issued to student")
-		self.save()
+		frappe.flags.in_student_materials_issued = True
+		try:
+			self.save()
+		finally:
+			frappe.flags.in_student_materials_issued = False
 
 	@frappe.whitelist()
 	def recalculate_payments(self):
@@ -258,7 +284,11 @@ class EEStudent(Document):
 			self.status = "Fully Paid"
 			self._log_system_activity("Fully paid — outstanding cleared")
 
-		self.save(ignore_permissions=True)
+		frappe.flags.in_student_fully_paid = True
+		try:
+			self.save(ignore_permissions=True)
+		finally:
+			frappe.flags.in_student_fully_paid = False
 
 	@frappe.whitelist()
 	def generate_web_form_link(self):
