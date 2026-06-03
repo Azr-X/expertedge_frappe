@@ -28,7 +28,10 @@
   "total_fee",
   "column_break_fee",
   "lumpsum_discount_percent",
-  "pre_approval_fee"
+  "pre_approval_fee",
+  "section_break_brochure",
+  "brochure_email_template",
+  "brochure"
  ],
  "fields": [
   {
@@ -171,10 +174,26 @@
    "label": "Pre-Approval Fee",
    "default": "200",
    "options": "currency"
+  },
+  {
+   "fieldname": "section_break_brochure",
+   "fieldtype": "Section Break",
+   "label": "Brochure"
+  },
+  {
+   "fieldname": "brochure_email_template",
+   "fieldtype": "Link",
+   "label": "Brochure Email Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "brochure",
+   "fieldtype": "Attach",
+   "label": "Brochure Attachment"
   }
  ],
  "links": [],
- "modified": "2026-06-01 12:00:00.000000",
+ "modified": "2026-06-02 13:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "EE Batch",

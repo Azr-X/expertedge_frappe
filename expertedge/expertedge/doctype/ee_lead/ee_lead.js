@@ -2,6 +2,8 @@ frappe.ui.form.on("EE Lead", {
 	refresh(frm) {
 		if (frm.is_new()) return;
 
+		frappe.whatsapp.add_button(frm, 'mobile_no');
+
 		const active = !frm.doc.converted && frm.doc.status !== "Lost" && frm.doc.status !== "Converted";
 
 		if (active) {

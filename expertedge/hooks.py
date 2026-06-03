@@ -8,6 +8,7 @@ app_license = "mit"
 required_apps = ["erpnext"]
 
 app_include_css = "/assets/expertedge/css/expertedge.css"
+app_include_js = "/assets/expertedge/js/whatsapp.js"
 
 fixtures = [
 	{
@@ -25,10 +26,6 @@ fixtures = [
 	{
 		"dt": "Email Template",
 		"filters": [["name", "like", "EE -%"]],
-	},
-	{
-		"dt": "Web Form",
-		"filters": [["name", "=", "program-enquiry"]],
 	},
 	{
 		"dt": "Custom HTML Block",

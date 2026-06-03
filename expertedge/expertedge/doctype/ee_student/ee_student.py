@@ -1,3 +1,5 @@
+import uuid
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -5,12 +7,22 @@ from frappe.utils import now_datetime, nowdate, flt
 
 
 class EEStudent(Document):
+	def before_insert(self):
+		if not self.web_form_token:
+			self.web_form_token = str(uuid.uuid4())[:12]
+
 	def validate(self):
+		self._auto_disable_web_edit()
 		self._resolve_fees()
 		self._compute_net_fee()
 		self._compute_aud_amount()
 		self._recompute_outstanding()
 		self._ensure_follow_up_todos()
+
+	def _auto_disable_web_edit(self):
+		"""Auto-disable web edit after guest submits the form."""
+		if frappe.flags.in_web_form and self.allow_web_edit:
+			self.allow_web_edit = 0
 
 	def _resolve_fees(self):
 		"""Resolve fees from Batch."""
@@ -246,3 +258,13 @@ class EEStudent(Document):
 			self._log_system_activity("Fully paid — outstanding cleared")
 
 		self.save(ignore_permissions=True)
+
+	@frappe.whitelist()
+	def generate_web_form_link(self):
+		"""Enable web edit and return the shareable link."""
+		if not self.web_form_token:
+			self.web_form_token = str(uuid.uuid4())[:12]
+		self.allow_web_edit = 1
+		self._log_system_activity("Web form edit link generated")
+		self.save(ignore_permissions=True)
+		return f"{frappe.utils.get_url()}/student-details/{self.name}?token={self.web_form_token}"

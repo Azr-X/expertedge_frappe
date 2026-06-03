@@ -2,6 +2,8 @@ frappe.ui.form.on("EE Student", {
 	refresh(frm) {
 		if (frm.is_new()) return;
 
+		frappe.whatsapp.add_button(frm, 'mobile_no');
+
 		if (frm.doc.status !== "Dropped") {
 			// Create Customer & Invoice — dialog with fee input
 			if (!frm.doc.sales_invoice) {
@@ -54,6 +56,20 @@ frappe.ui.form.on("EE Student", {
 				frm.call("issue_materials").then(() => frm.reload_doc());
 			}, __("Actions"));
 		}
+
+		// Generate Web Form Link
+		frm.add_custom_button(__("Generate Web Form Link"), function () {
+			frm.call("generate_web_form_link").then((r) => {
+				if (r && r.message) {
+					frm.reload_doc();
+					frappe.msgprint({
+						title: __("Student Details Link"),
+						indicator: "green",
+						message: __("Share this link with the student via WhatsApp:<br><br><code>{0}</code><br><br><button class='btn btn-xs btn-default' onclick='navigator.clipboard.writeText(\"{0}\");frappe.show_alert(\"Copied!\")'>Copy Link</button>", [r.message]),
+					});
+				}
+			});
+		}, __("Actions"));
 
 		// Show lead link
 		if (frm.doc.lead) {

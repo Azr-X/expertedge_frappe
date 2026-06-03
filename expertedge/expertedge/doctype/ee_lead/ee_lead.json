@@ -10,11 +10,20 @@
   "email",
   "mobile_no",
   "column_break_candidate",
+  "date_of_birth",
   "nationality",
   "state",
+  "permanent_address",
+  "pincode",
+  "section_professional",
   "highest_qualification",
+  "specialization",
+  "year_of_qualification",
+  "institution",
+  "column_break_professional",
   "years_of_experience",
   "current_designation",
+  "current_employer",
   "program",
   "section_lead_mgmt",
   "status",
@@ -88,6 +97,11 @@
    "reqd": 1
   },
   {
+   "fieldname": "date_of_birth",
+   "fieldtype": "Date",
+   "label": "Date of Birth"
+  },
+  {
    "fieldname": "column_break_candidate",
    "fieldtype": "Column Break"
   },
@@ -103,9 +117,43 @@
    "label": "State"
   },
   {
+   "fieldname": "permanent_address",
+   "fieldtype": "Small Text",
+   "label": "Permanent Address"
+  },
+  {
+   "fieldname": "pincode",
+   "fieldtype": "Data",
+   "label": "Pin Code"
+  },
+  {
+   "fieldname": "section_professional",
+   "fieldtype": "Section Break",
+   "label": "Qualification & Employment"
+  },
+  {
    "fieldname": "highest_qualification",
    "fieldtype": "Data",
    "label": "Highest Qualification"
+  },
+  {
+   "fieldname": "specialization",
+   "fieldtype": "Data",
+   "label": "Specialization"
+  },
+  {
+   "fieldname": "year_of_qualification",
+   "fieldtype": "Data",
+   "label": "Year of Qualification"
+  },
+  {
+   "fieldname": "institution",
+   "fieldtype": "Data",
+   "label": "Institution"
+  },
+  {
+   "fieldname": "column_break_professional",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "years_of_experience",
@@ -116,6 +164,11 @@
    "fieldname": "current_designation",
    "fieldtype": "Data",
    "label": "Current Designation"
+  },
+  {
+   "fieldname": "current_employer",
+   "fieldtype": "Data",
+   "label": "Current Employer"
   },
   {
    "fieldname": "program",
@@ -359,7 +412,7 @@
   }
  ],
  "links": [],
- "modified": "2026-06-01 13:00:00.000000",
+ "modified": "2026-06-02 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "EE Lead",

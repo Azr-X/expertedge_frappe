@@ -10,10 +10,20 @@
   "email",
   "mobile_no",
   "column_break_candidate",
+  "date_of_birth",
   "nationality",
+  "state",
+  "permanent_address",
+  "pincode",
+  "section_professional",
   "highest_qualification",
+  "specialization",
+  "year_of_qualification",
+  "institution",
+  "column_break_professional",
   "years_of_experience",
   "current_designation",
+  "current_employer",
   "program",
   "batch",
   "lead",
@@ -56,7 +66,10 @@
   "program_timing",
   "program_country",
   "materials_issued",
-  "materials_issued_on"
+  "materials_issued_on",
+  "section_web_form",
+  "allow_web_edit",
+  "web_form_token"
  ],
  "fields": [
   {
@@ -89,6 +102,11 @@
    "options": "Phone"
   },
   {
+   "fieldname": "date_of_birth",
+   "fieldtype": "Date",
+   "label": "Date of Birth"
+  },
+  {
    "fieldname": "column_break_candidate",
    "fieldtype": "Column Break"
   },
@@ -99,9 +117,48 @@
    "options": "Country"
   },
   {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fieldname": "permanent_address",
+   "fieldtype": "Small Text",
+   "label": "Permanent Address"
+  },
+  {
+   "fieldname": "pincode",
+   "fieldtype": "Data",
+   "label": "Pin Code"
+  },
+  {
+   "fieldname": "section_professional",
+   "fieldtype": "Section Break",
+   "label": "Qualification & Employment"
+  },
+  {
    "fieldname": "highest_qualification",
    "fieldtype": "Data",
    "label": "Highest Qualification"
+  },
+  {
+   "fieldname": "specialization",
+   "fieldtype": "Data",
+   "label": "Specialization"
+  },
+  {
+   "fieldname": "year_of_qualification",
+   "fieldtype": "Data",
+   "label": "Year of Qualification"
+  },
+  {
+   "fieldname": "institution",
+   "fieldtype": "Data",
+   "label": "Institution"
+  },
+  {
+   "fieldname": "column_break_professional",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "years_of_experience",
@@ -112,6 +169,11 @@
    "fieldname": "current_designation",
    "fieldtype": "Data",
    "label": "Current Designation"
+  },
+  {
+   "fieldname": "current_employer",
+   "fieldtype": "Data",
+   "label": "Current Employer"
   },
   {
    "fieldname": "program",
@@ -378,6 +440,27 @@
    "fieldname": "materials_issued_on",
    "fieldtype": "Date",
    "label": "Issued On"
+  },
+  {
+   "fieldname": "section_web_form",
+   "fieldtype": "Section Break",
+   "label": "Web Form Access",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "allow_web_edit",
+   "fieldtype": "Check",
+   "label": "Allow Web Edit",
+   "description": "Enable to let student update details via web form link. Auto-disables after submission."
+  },
+  {
+   "fieldname": "web_form_token",
+   "fieldtype": "Data",
+   "label": "Web Form Token",
+   "read_only": 1,
+   "unique": 1,
+   "no_copy": 1,
+   "hidden": 1
   }
  ],
  "links": [
@@ -387,7 +470,7 @@
    "link_fieldname": "student"
   }
  ],
- "modified": "2026-05-31 12:00:00.000000",
+ "modified": "2026-06-03 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "EE Student",

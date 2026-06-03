@@ -7,8 +7,17 @@ from frappe.utils import now_datetime, get_datetime, nowdate
 class EELead(Document):
 	def before_insert(self):
 		self.lead_received_on = now_datetime()
+		self._set_web_form_defaults()
 		self._seed_mandatory_documents()
 		self._set_default_program()
+
+	def _set_web_form_defaults(self):
+		"""Auto-set lead_source for guest web form submissions."""
+		if frappe.session.user == "Guest" and not self.lead_source:
+			if frappe.db.exists("EE Lead Source", {"source_name": "Contact Form"}):
+				self.lead_source = "Contact Form"
+			elif frappe.db.exists("EE Lead Source", {"source_name": "Website"}):
+				self.lead_source = "Website"
 
 	def after_insert(self):
 		self._create_first_contact_todo()
@@ -150,17 +159,21 @@ class EELead(Document):
 
 	@frappe.whitelist()
 	def send_brochure(self):
-		settings = frappe.get_cached_doc("ExpertEdge Settings")
-		if not settings.brochure_email_template:
-			frappe.throw(_("Brochure Email Template not set in ExpertEdge Settings"))
+		if not self.preferred_batch:
+			frappe.throw(_("Set Preferred Batch before sending brochure"))
 
-		template = frappe.get_doc("Email Template", settings.brochure_email_template)
+		batch = frappe.get_cached_doc("EE Batch", self.preferred_batch)
+
+		if not batch.brochure_email_template:
+			frappe.throw(_("Brochure Email Template not set on Batch {0}").format(self.preferred_batch))
+		if not batch.brochure:
+			frappe.throw(_("Brochure attachment not set on Batch {0}").format(self.preferred_batch))
+
+		template = frappe.get_doc("Email Template", batch.brochure_email_template)
 		message = frappe.render_template(template.response_html or template.response, {"doc": self})
 		subject = frappe.render_template(template.subject, {"doc": self})
 
-		attachments = []
-		if settings.default_brochure:
-			attachments.append({"file_url": settings.default_brochure})
+		attachments = [{"file_url": batch.brochure}]
 
 		frappe.sendmail(
 			recipients=[self.email],
@@ -226,10 +239,18 @@ class EELead(Document):
 		student.student_name = self.lead_name
 		student.email = self.email
 		student.mobile_no = self.mobile_no
+		student.date_of_birth = self.date_of_birth
 		student.nationality = self.nationality
+		student.state = self.state
+		student.permanent_address = self.permanent_address
+		student.pincode = self.pincode
 		student.highest_qualification = self.highest_qualification
+		student.specialization = self.specialization
+		student.year_of_qualification = self.year_of_qualification
+		student.institution = self.institution
 		student.years_of_experience = self.years_of_experience
 		student.current_designation = self.current_designation
+		student.current_employer = self.current_employer
 		student.program = self.program
 		student.batch = self.preferred_batch
 		student.lead = self.name
