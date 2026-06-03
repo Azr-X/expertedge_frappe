@@ -79,3 +79,6 @@ Official India partner for CMA Australia & New Zealand. Leads from ads → quali
 1. Site name + Company name
 2. AED bank/cash account (deposit_account)
 3. Service Item + Income Account (or create CMA Program Fee)
+
+
+test
