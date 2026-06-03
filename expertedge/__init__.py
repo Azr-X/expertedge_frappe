@@ -11,7 +11,7 @@ def _patched_has_web_form_permission(self, doctype, name, ptype="read"):
 	"""Allow token-validated guest access to EE Student web form."""
 	if (
 		doctype == "EE Student"
-		and frappe.session.user == "Guest"
+		and frappe.session.user in ("Guest", "token-validated-guest")
 		and frappe.form_dict.get("token")
 	):
 		token = frappe.form_dict.get("token")
