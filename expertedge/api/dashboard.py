@@ -68,8 +68,7 @@ def get_dashboard_stats():
 	today = nowdate()
 	return {
 		"new_leads_today": frappe.db.count("EE Lead", {
-			"creation": [">=", today],
-			"creation": ["<=", today + " 23:59:59"],
+			"creation": ["between", [today, today + " 23:59:59"]],
 		}),
 		"calls_today": frappe.db.sql("""
 			SELECT COUNT(*) FROM `tabEE Call Log`
