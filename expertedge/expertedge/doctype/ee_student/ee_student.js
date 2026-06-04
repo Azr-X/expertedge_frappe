@@ -21,29 +21,39 @@ frappe.ui.form.on("EE Student", {
 				_show_payment_link_dialog(frm);
 			}, __("Billing"));
 
-			// Email buttons (all with confirmation)
-			frm.add_custom_button(__("Send Pre-Approval Email"), function () {
-				frappe.confirm(__("Send pre-approval email to {0}?", [frm.doc.email]), function () {
-					frm.call("send_pre_approval_email").then(() => frm.reload_doc());
+			// Email buttons (Send Email / Manually Sent dialog)
+			function email_action_dialog(title, method, email) {
+				let d = new frappe.ui.Dialog({
+					title: __(title),
+					primary_action_label: __("Send Email"),
+					primary_action: function () {
+						d.hide();
+						frm.call(method, { send_email: 1 }).then(() => frm.reload_doc());
+					},
+					secondary_action_label: __("Manually Sent"),
+					secondary_action: function () {
+						d.hide();
+						frm.call(method, { send_email: 0 }).then(() => frm.reload_doc());
+					},
 				});
+				d.$body.html(__("How was this communicated to {0}?", [email]));
+				d.show();
+			}
+
+			frm.add_custom_button(__("Send Pre-Approval Email"), function () {
+				email_action_dialog("Pre-Approval", "send_pre_approval_email", frm.doc.email);
 			}, __("Email"));
 
 			frm.add_custom_button(__("Send Receipt"), function () {
-				frappe.confirm(__("Send payment receipt email to {0}?", [frm.doc.email]), function () {
-					frm.call("send_receipt_email").then(() => frm.reload_doc());
-				});
+				email_action_dialog("Payment Receipt", "send_receipt_email", frm.doc.email);
 			}, __("Email"));
 
 			frm.add_custom_button(__("Send Balance Email"), function () {
-				frappe.confirm(__("Send balance payment email to {0}?", [frm.doc.email]), function () {
-					frm.call("send_balance_email").then(() => frm.reload_doc());
-				});
+				email_action_dialog("Balance Payment", "send_balance_email", frm.doc.email);
 			}, __("Email"));
 
 			frm.add_custom_button(__("Send Welcome Email"), function () {
-				frappe.confirm(__("Send welcome email to {0}?", [frm.doc.email]), function () {
-					frm.call("send_welcome_email").then(() => frm.reload_doc());
-				});
+				email_action_dialog("Welcome Email", "send_welcome_email", frm.doc.email);
 			}, __("Email"));
 
 			// Mark CMA Registered

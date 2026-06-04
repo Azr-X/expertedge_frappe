@@ -208,40 +208,43 @@ class EEStudent(Document):
 			self.create_customer_and_invoice()
 
 	@frappe.whitelist()
-	def send_pre_approval_email(self):
-		self._send_template_email("pre_approval_email_template", "Pre-approval email sent")
+	def send_pre_approval_email(self, send_email=True):
+		self._send_template_email("pre_approval_email_template", "Pre-approval", send_email)
 
 	@frappe.whitelist()
-	def send_receipt_email(self):
-		self._send_template_email("payment_receipt_email_template", "Payment receipt email sent")
+	def send_receipt_email(self, send_email=True):
+		self._send_template_email("payment_receipt_email_template", "Payment receipt", send_email)
 
 	@frappe.whitelist()
-	def send_balance_email(self):
-		self._send_template_email("balance_payment_email_template", "Balance payment email sent")
+	def send_balance_email(self, send_email=True):
+		self._send_template_email("balance_payment_email_template", "Balance payment email", send_email)
 
 	@frappe.whitelist()
-	def send_welcome_email(self):
-		self._send_template_email("welcome_email_template", "Welcome email sent")
+	def send_welcome_email(self, send_email=True):
+		self._send_template_email("welcome_email_template", "Welcome email", send_email)
 
-	def _send_template_email(self, template_field, log_message):
-		settings = frappe.get_cached_doc("ExpertEdge Settings")
-		template_name = settings.get(template_field)
-		if not template_name:
-			frappe.throw(_("Email template '{0}' not set in ExpertEdge Settings").format(template_field))
+	def _send_template_email(self, template_field, label, send_email=True):
+		send_email = frappe.parse_val(send_email)
 
-		template = frappe.get_doc("Email Template", template_name)
-		message = frappe.render_template(template.response_html or template.response, {"doc": self})
-		subject = frappe.render_template(template.subject, {"doc": self})
+		if send_email:
+			settings = frappe.get_cached_doc("ExpertEdge Settings")
+			template_name = settings.get(template_field)
+			if not template_name:
+				frappe.throw(_("Email template '{0}' not set in ExpertEdge Settings").format(template_field))
 
-		frappe.sendmail(
-			recipients=[self.email],
-			subject=subject,
-			message=message,
-			reference_doctype="EE Student",
-			reference_name=self.name,
-		)
+			template = frappe.get_doc("Email Template", template_name)
+			message = frappe.render_template(template.response_html or template.response, {"doc": self})
+			subject = frappe.render_template(template.subject, {"doc": self})
 
-		self._log_system_activity(log_message)
+			frappe.sendmail(
+				recipients=[self.email],
+				subject=subject,
+				message=message,
+				reference_doctype="EE Student",
+				reference_name=self.name,
+			)
+
+		self._log_system_activity(label + (" emailed" if send_email else " marked sent manually"))
 		self.save(ignore_permissions=True)
 
 	@frappe.whitelist()

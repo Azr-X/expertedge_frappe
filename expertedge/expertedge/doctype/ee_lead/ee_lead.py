@@ -179,35 +179,38 @@ class EELead(Document):
 		})
 
 	@frappe.whitelist()
-	def send_brochure(self):
+	def send_brochure(self, send_email=True):
+		send_email = frappe.parse_val(send_email)
+
 		if not self.preferred_batch:
 			frappe.throw(_("Set Preferred Batch before sending brochure"))
 
-		batch = frappe.get_cached_doc("EE Batch", self.preferred_batch)
+		if send_email:
+			batch = frappe.get_cached_doc("EE Batch", self.preferred_batch)
 
-		if not batch.brochure_email_template:
-			frappe.throw(_("Brochure Email Template not set on Batch {0}").format(self.preferred_batch))
-		if not batch.brochure:
-			frappe.throw(_("Brochure attachment not set on Batch {0}").format(self.preferred_batch))
+			if not batch.brochure_email_template:
+				frappe.throw(_("Brochure Email Template not set on Batch {0}").format(self.preferred_batch))
+			if not batch.brochure:
+				frappe.throw(_("Brochure attachment not set on Batch {0}").format(self.preferred_batch))
 
-		template = frappe.get_doc("Email Template", batch.brochure_email_template)
-		message = frappe.render_template(template.response_html or template.response, {"doc": self})
-		subject = frappe.render_template(template.subject, {"doc": self})
+			template = frappe.get_doc("Email Template", batch.brochure_email_template)
+			message = frappe.render_template(template.response_html or template.response, {"doc": self})
+			subject = frappe.render_template(template.subject, {"doc": self})
 
-		attachments = [{"file_url": batch.brochure}]
+			attachments = [{"file_url": batch.brochure}]
 
-		frappe.sendmail(
-			recipients=[self.email],
-			subject=subject,
-			message=message,
-			attachments=attachments,
-			reference_doctype="EE Lead",
-			reference_name=self.name,
-		)
+			frappe.sendmail(
+				recipients=[self.email],
+				subject=subject,
+				message=message,
+				attachments=attachments,
+				reference_doctype="EE Lead",
+				reference_name=self.name,
+			)
 
 		self.brochure_sent_on = now_datetime()
 		self.status = "Brochure Sent"
-		self._log_system_activity("Brochure sent to candidate")
+		self._log_system_activity("Brochure " + ("emailed" if send_email else "marked sent via WhatsApp/other"))
 		frappe.flags.in_lead_send_brochure = True
 		try:
 			self.save()
@@ -215,26 +218,29 @@ class EELead(Document):
 			frappe.flags.in_lead_send_brochure = False
 
 	@frappe.whitelist()
-	def request_documents(self):
-		settings = frappe.get_cached_doc("ExpertEdge Settings")
-		if not settings.doc_request_email_template:
-			frappe.throw(_("Document Request Email Template not set in ExpertEdge Settings"))
+	def request_documents(self, send_email=True):
+		send_email = frappe.parse_val(send_email)
 
-		template = frappe.get_doc("Email Template", settings.doc_request_email_template)
-		message = frappe.render_template(template.response_html or template.response, {"doc": self})
-		subject = frappe.render_template(template.subject, {"doc": self})
+		if send_email:
+			settings = frappe.get_cached_doc("ExpertEdge Settings")
+			if not settings.doc_request_email_template:
+				frappe.throw(_("Document Request Email Template not set in ExpertEdge Settings"))
 
-		frappe.sendmail(
-			recipients=[self.email],
-			subject=subject,
-			message=message,
-			reference_doctype="EE Lead",
-			reference_name=self.name,
-		)
+			template = frappe.get_doc("Email Template", settings.doc_request_email_template)
+			message = frappe.render_template(template.response_html or template.response, {"doc": self})
+			subject = frappe.render_template(template.subject, {"doc": self})
+
+			frappe.sendmail(
+				recipients=[self.email],
+				subject=subject,
+				message=message,
+				reference_doctype="EE Lead",
+				reference_name=self.name,
+			)
 
 		self.docs_requested_on = now_datetime()
 		self.status = "Docs Requested"
-		self._log_system_activity("Document request email sent")
+		self._log_system_activity("Document request " + ("emailed" if send_email else "marked sent manually"))
 		frappe.flags.in_lead_request_docs = True
 		try:
 			self.save()

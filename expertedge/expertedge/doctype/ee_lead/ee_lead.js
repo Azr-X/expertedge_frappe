@@ -8,21 +8,39 @@ frappe.ui.form.on("EE Lead", {
 
 		if (active) {
 			frm.add_custom_button(__("Send Brochure"), function () {
-				frappe.confirm(
-					__("Send brochure email to {0}?", [frm.doc.email]),
-					function () {
-						frm.call("send_brochure").then(() => frm.reload_doc());
-					}
-				);
+				let d = new frappe.ui.Dialog({
+					title: __("Send Brochure"),
+					primary_action_label: __("Send Email"),
+					primary_action: function () {
+						d.hide();
+						frm.call("send_brochure", { send_email: 1 }).then(() => frm.reload_doc());
+					},
+					secondary_action_label: __("Manually Sent"),
+					secondary_action: function () {
+						d.hide();
+						frm.call("send_brochure", { send_email: 0 }).then(() => frm.reload_doc());
+					},
+				});
+				d.$body.html(__("How was the brochure sent to {0}?", [frm.doc.email]));
+				d.show();
 			}, __("Actions"));
 
 			frm.add_custom_button(__("Request Documents"), function () {
-				frappe.confirm(
-					__("Send document request email to {0}?", [frm.doc.email]),
-					function () {
-						frm.call("request_documents").then(() => frm.reload_doc());
-					}
-				);
+				let d = new frappe.ui.Dialog({
+					title: __("Request Documents"),
+					primary_action_label: __("Send Email"),
+					primary_action: function () {
+						d.hide();
+						frm.call("request_documents", { send_email: 1 }).then(() => frm.reload_doc());
+					},
+					secondary_action_label: __("Manually Sent"),
+					secondary_action: function () {
+						d.hide();
+						frm.call("request_documents", { send_email: 0 }).then(() => frm.reload_doc());
+					},
+				});
+				d.$body.html(__("How was the document request sent to {0}?", [frm.doc.email]));
+				d.show();
 			}, __("Actions"));
 
 			frm.add_custom_button(__("Mark Documents Verified"), function () {
