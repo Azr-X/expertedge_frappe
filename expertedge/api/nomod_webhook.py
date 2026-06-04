@@ -55,25 +55,16 @@ def handle(**kwargs):
 	charge_id = payload.get("objectId")
 	data = payload.get("data", {})
 
-	frappe.logger().info(f"Nomod webhook: {event_type} | event={event_id} | charge={charge_id}")
+	# Log every webhook event
+	frappe.log_error(
+		title=f"Nomod webhook: {event_type}",
+		message=json.dumps(payload, indent=2, default=str),
+	)
 
 	if event_type == "charge.completed":
 		return _handle_charge_completed(charge_id, data)
-	elif event_type == "charge.authorised":
-		frappe.log_error(
-			title="Nomod: charge authorised",
-			message=f"Charge {charge_id} authorised. Awaiting capture.\n{json.dumps(data, indent=2)}"
-		)
-		return {"status": "noted"}
-	elif event_type == "charge.failed":
-		frappe.log_error(
-			title="Nomod: charge failed",
-			message=f"Charge {charge_id} failed.\n{json.dumps(data, indent=2)}"
-		)
-		return {"status": "noted"}
 	else:
-		frappe.logger().info(f"Nomod webhook: unhandled event type {event_type}")
-		return {"status": "ignored"}
+		return {"status": "noted", "event": event_type}
 
 
 def _handle_charge_completed(charge_id, data):
