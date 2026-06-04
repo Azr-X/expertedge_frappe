@@ -1,8 +1,16 @@
 """Nomod API client for ExpertEdge.
 
+Documented endpoints only:
+- POST /v1/links — create payment link
+- POST /v1/checkout — create checkout session
+
 API Reference: https://nomod.com/docs/api-reference/introduction
 Base URL: https://api.nomod.com/v1
 Auth: X-API-KEY header
+
+Webhooks (Svix-based):
+- charge.completed, charge.authorised, charge.failed, etc.
+- Signature: HMAC-SHA256 via svix-id, svix-timestamp, svix-signature headers
 """
 
 import frappe
@@ -55,7 +63,6 @@ def _request(method, path, data=None, params=None):
 	if response.status_code in (200, 201):
 		return response.json()
 
-	# Handle errors
 	try:
 		error_data = response.json()
 		error_msg = error_data.get("detail") or error_data.get("message") or str(error_data)
@@ -75,18 +82,8 @@ def create_link(amount, currency, title=None, note=None, reference=None,
                 success_url=None, failure_url=None, expiry_date=None):
 	"""Create a Nomod payment link.
 
-	Args:
-		amount: Payment amount (decimal string or number)
-		currency: ISO 4217 currency code (e.g. AED)
-		title: Link display name (max 50 chars)
-		note: Description (max 280 chars)
-		reference: Internal reference (stored in item SKU)
-		success_url: Redirect after successful payment
-		failure_url: Redirect after failed payment
-		expiry_date: Auto-expire date (YYYY-MM-DD)
-
-	Returns:
-		dict: Nomod link object with id, url, reference_id, etc.
+	Documented: POST /v1/links
+	https://nomod.com/docs/api-reference/generate-link
 	"""
 	settings = get_settings()
 
@@ -96,7 +93,6 @@ def create_link(amount, currency, title=None, note=None, reference=None,
 			"name": title or "Payment",
 			"amount": str(amount),
 			"quantity": 1,
-			"sku": reference or "",
 		}],
 		"allow_service_fee": bool(settings.allow_service_fee),
 		"allow_tabby": bool(settings.allow_tabby),
@@ -108,7 +104,6 @@ def create_link(amount, currency, title=None, note=None, reference=None,
 	if note:
 		data["note"] = note[:280]
 
-	# Success/failure URLs
 	redirect_success = success_url or settings.default_success_url
 	redirect_failure = failure_url or settings.default_failure_url
 	if redirect_success:
@@ -116,7 +111,6 @@ def create_link(amount, currency, title=None, note=None, reference=None,
 	if redirect_failure:
 		data["failure_url"] = redirect_failure
 
-	# Expiry
 	if expiry_date:
 		data["expiry_date"] = str(expiry_date)
 	elif settings.payment_expiry_days:
@@ -125,85 +119,57 @@ def create_link(amount, currency, title=None, note=None, reference=None,
 	return _request("POST", "links", data=data)
 
 
-def get_link(link_id):
-	"""Retrieve a Nomod link by ID.
+def verify_webhook_signature(payload, headers):
+	"""Verify Nomod/Svix webhook signature.
 
 	Args:
-		link_id: UUID of the Nomod link
+		payload: Raw request body (bytes)
+		headers: Dict with svix-id, svix-timestamp, svix-signature
 
 	Returns:
-		dict: Nomod link object
+		True if signature valid, False otherwise
 	"""
-	return _request("GET", f"links/{link_id}")
+	import hmac
+	import hashlib
+	import base64
+	import time
 
+	settings = get_settings()
+	secret = settings.get_password("webhook_secret") if settings.webhook_secret else None
+	if not secret:
+		frappe.log_error("Nomod webhook: no webhook_secret configured")
+		return False
 
-def list_links(currency=None, status=None, page=1, page_size=20, search=None):
-	"""List Nomod payment links.
+	svix_id = headers.get("svix-id")
+	svix_timestamp = headers.get("svix-timestamp")
+	svix_signature = headers.get("svix-signature")
 
-	Returns:
-		dict: {count, next, previous, results: [...]}
-	"""
-	params = {"page": page, "page_size": page_size}
-	if currency:
-		params["currency"] = currency
-	if status:
-		params["status"] = status
-	if search:
-		params["search"] = search
-	return _request("GET", "links", params=params)
+	if not all([svix_id, svix_timestamp, svix_signature]):
+		return False
 
+	# Reject if timestamp older than 5 minutes
+	try:
+		ts = int(svix_timestamp)
+		if abs(time.time() - ts) > 300:
+			frappe.log_error("Nomod webhook: timestamp too old/new")
+			return False
+	except (ValueError, TypeError):
+		return False
 
-def delete_link(link_id):
-	"""Delete/disable a Nomod link."""
-	return _request("DELETE", f"links/{link_id}")
+	# Compute expected signature
+	# Secret format: "whsec_<base64>" — strip prefix
+	secret_part = secret.split("_", 1)[1] if "_" in secret else secret
+	secret_bytes = base64.b64decode(secret_part)
 
+	signed_content = f"{svix_id}.{svix_timestamp}.{payload.decode('utf-8')}"
+	expected = base64.b64encode(
+		hmac.new(secret_bytes, signed_content.encode("utf-8"), hashlib.sha256).digest()
+	).decode("utf-8")
 
-def get_charge(charge_id):
-	"""Retrieve a charge (completed payment) by ID.
+	# svix-signature can have multiple sigs: "v1,sig1 v1,sig2"
+	for sig in svix_signature.split(" "):
+		sig_value = sig.split(",", 1)[1] if "," in sig else sig
+		if hmac.compare_digest(expected, sig_value):
+			return True
 
-	Args:
-		charge_id: UUID of the charge
-
-	Returns:
-		dict: Charge object with status, amount, payment_method, etc.
-	"""
-	return _request("GET", f"charges/{charge_id}")
-
-
-def list_charges(link_id=None, status=None, currency=None, page=1, page_size=20):
-	"""List charges, optionally filtered by link_id.
-
-	Args:
-		link_id: Filter charges for a specific link
-		status: Filter by charge status
-		currency: Filter by currency
-		page: Page number
-		page_size: Results per page
-
-	Returns:
-		dict: {count, next, previous, results: [...]}
-	"""
-	params = {"page": page, "page_size": page_size}
-	if link_id:
-		params["link_id"] = link_id
-	if status:
-		params["status"] = status
-	if currency:
-		params["currency"] = currency
-	return _request("GET", "charges", params=params)
-
-
-def refund_charge(charge_id, amount=None):
-	"""Refund a charge (full or partial).
-
-	Args:
-		charge_id: UUID of the charge to refund
-		amount: Partial refund amount (omit for full refund)
-
-	Returns:
-		dict: Refund result
-	"""
-	data = {}
-	if amount is not None:
-		data["amount"] = str(amount)
-	return _request("POST", f"charges/{charge_id}/refund", data=data)
+	return False

@@ -63,35 +63,20 @@ class EENomodPaymentLink(Document):
 
 	@frappe.whitelist()
 	def check_payment_status(self):
-		"""Check if this link has been paid via Nomod API (poll charges)."""
-		nomod_settings = frappe.get_cached_doc("Nomod Settings")
-		if not nomod_settings.enabled or not self.nomod_reference:
-			frappe.throw(_("Nomod integration not enabled or no reference ID"))
-
-		if self.nomod_reference.startswith("PLACEHOLDER"):
-			frappe.throw(_("Cannot check status on placeholder links"))
-
-		from expertedge.nomod import list_charges
-
-		charges = list_charges(link_id=self.nomod_reference)
-		paid_charges = [
-			c for c in charges.get("results", [])
-			if c.get("status") in ("captured", "paid")
-		]
-
-		if paid_charges:
-			charge = paid_charges[0]
+		"""Check payment status. Nomod has no GET endpoint for charges —
+		payment confirmation comes only via webhook (charge.completed).
+		This method just shows current status from our records."""
+		if self.status == "Paid":
 			frappe.msgprint(
-				_("Payment found! Charge {0} — {1} {2}").format(
-					charge.get("reference_id"),
-					charge.get("currency"),
-					charge.get("total"),
-				),
+				_("Payment confirmed. PE: {0}").format(self.payment_entry),
 				indicator="green",
 			)
-			return {"paid": True, "charge": charge}
+			return {"paid": True, "payment_entry": self.payment_entry}
 
-		frappe.msgprint(_("No payment found yet for this link."), indicator="orange")
+		frappe.msgprint(
+			_("Payment not yet confirmed. It will update automatically when Nomod sends the webhook."),
+			indicator="orange",
+		)
 		return {"paid": False}
 
 	@frappe.whitelist()

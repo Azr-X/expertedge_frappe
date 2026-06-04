@@ -10,7 +10,7 @@
    "fieldtype": "Date",
    "label": "From Date",
    "mandatory": 1,
-   "default": "Today"
+   "default": "frappe.datetime.month_start()"
   },
   {
    "fieldname": "to_date",
@@ -27,12 +27,12 @@
   }
  ],
  "is_standard": "Yes",
- "modified": "2026-06-03 18:06:38.119046",
+ "modified": "2026-06-04 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "Daily Activity Record",
  "owner": "Administrator",
- "ref_doctype": "EE Attendance",
+ "ref_doctype": "EE Lead",
  "report_name": "Daily Activity Record",
  "report_type": "Script Report",
  "roles": [

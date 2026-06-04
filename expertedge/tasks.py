@@ -116,61 +116,6 @@ def check_payment_sla():
 		)
 
 
-def check_nomod_payments():
-	"""Poll Nomod API for paid charges on open payment links.
-
-	Only checks links that:
-	- Are in Generated/Sent status
-	- Were generated more than 30 min ago (give callback time to fire first)
-	- Have a real nomod_reference (not placeholder)
-	- Nomod integration is enabled
-	"""
-	nomod_settings = frappe.get_cached_doc("Nomod Settings")
-	if not nomod_settings.enabled:
-		return
-
-	cutoff = add_to_date(now_datetime(), minutes=-30)
-
-	open_links = frappe.get_all(
-		"EE Nomod Payment Link",
-		filters={
-			"status": ["in", ["Generated", "Sent"]],
-			"generated_on": ["<", cutoff],
-			"nomod_reference": ["not like", "PLACEHOLDER%"],
-		},
-		fields=["name", "nomod_reference"],
-	)
-
-	if not open_links:
-		return
-
-	from expertedge.nomod import list_charges, NomodAPIError
-
-	for link_doc in open_links:
-		try:
-			charges = list_charges(link_id=link_doc.nomod_reference)
-			paid_charges = [
-				c for c in charges.get("results", [])
-				if c.get("status") in ("captured", "paid")
-			]
-
-			if paid_charges:
-				link = frappe.get_doc("EE Nomod Payment Link", link_doc.name)
-				link.mark_paid()
-				frappe.db.commit()
-				frappe.logger().info(f"Nomod auto-paid: {link_doc.name}")
-
-		except NomodAPIError as e:
-			frappe.log_error(
-				title=f"Nomod poll error: {link_doc.name}",
-				message=str(e),
-			)
-		except Exception as e:
-			frappe.log_error(
-				title=f"Nomod poll error: {link_doc.name}",
-				message=str(e),
-			)
-
 
 def _ensure_sla_todo(doctype, docname, allocated_to, description):
 	"""Create a ToDo if an open one with same description doesn't exist (idempotent)."""

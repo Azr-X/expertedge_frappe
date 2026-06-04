@@ -59,6 +59,5 @@ scheduler_events = {
 		"expertedge.tasks.check_first_contact_sla",
 		"expertedge.tasks.check_doc_sla",
 		"expertedge.tasks.check_payment_sla",
-		"expertedge.tasks.check_nomod_payments",
 	],
 }
