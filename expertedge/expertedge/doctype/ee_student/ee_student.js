@@ -31,6 +31,8 @@ frappe.ui.form.on("EE Student", {
 					fields: [
 						{ fieldname: "email", label: "Email", fieldtype: "Data", options: "Email" },
 						{ fieldname: "batch", label: "Batch", fieldtype: "Link", options: "EE Batch" },
+						{ fieldname: "pre_approval_fee", label: "Pre-Approval Fee", fieldtype: "Currency" },
+						{ fieldname: "net_fee", label: "Net Fee (Total)", fieldtype: "Currency" },
 					],
 				});
 			}, __("Email"));
@@ -41,11 +43,16 @@ frappe.ui.form.on("EE Student", {
 					method: "send_receipt_email",
 					fields: [
 						{ fieldname: "email", label: "Email", fieldtype: "Data", options: "Email" },
+						{ fieldname: "total_paid", label: "Total Paid", fieldtype: "Currency" },
 					],
 				});
 			}, __("Email"));
 
 			frm.add_custom_button(__("Send Balance Email"), function () {
+				if (!frm.doc.outstanding || flt(frm.doc.outstanding) <= 0) {
+					frappe.msgprint(__("No outstanding balance. Nothing to send."));
+					return;
+				}
 				_email_with_field_check(frm, {
 					title: "Balance Payment Email",
 					method: "send_balance_email",
@@ -64,6 +71,7 @@ frappe.ui.form.on("EE Student", {
 						{ fieldname: "venue", label: "Venue", fieldtype: "Small Text" },
 						{ fieldname: "program_start_date", label: "Program Start Date", fieldtype: "Date" },
 						{ fieldname: "program_timing", label: "Timing", fieldtype: "Data" },
+						{ fieldname: "program_country", label: "Country", fieldtype: "Link", options: "Country" },
 					],
 				});
 			}, __("Email"));
