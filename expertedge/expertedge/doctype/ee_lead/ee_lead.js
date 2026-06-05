@@ -10,39 +10,24 @@ frappe.ui.form.on("EE Lead", {
 
 		if (active) {
 			frm.add_custom_button(__("Send Brochure"), function () {
-				let d = new frappe.ui.Dialog({
-					title: __("Send Brochure"),
-					primary_action_label: __("Send Email"),
-					primary_action: function () {
-						d.hide();
-						frm.call("send_brochure", { send_email: 1 }).then(() => frm.reload_doc());
-					},
-					secondary_action_label: __("Manually Sent"),
-					secondary_action: function () {
-						d.hide();
-						frm.call("send_brochure", { send_email: 0 }).then(() => frm.reload_doc());
-					},
+				_email_with_field_check(frm, {
+					title: "Send Brochure",
+					method: "send_brochure",
+					fields: [
+						{ fieldname: "email", label: "Email", fieldtype: "Data", options: "Email" },
+						{ fieldname: "preferred_batch", label: "Preferred Batch", fieldtype: "Link", options: "EE Batch" },
+					],
 				});
-				d.$body.html(__("How was the brochure sent to {0}?", [frm.doc.email]));
-				d.show();
 			}, __("Actions"));
 
 			frm.add_custom_button(__("Request Documents"), function () {
-				let d = new frappe.ui.Dialog({
-					title: __("Request Documents"),
-					primary_action_label: __("Send Email"),
-					primary_action: function () {
-						d.hide();
-						frm.call("request_documents", { send_email: 1 }).then(() => frm.reload_doc());
-					},
-					secondary_action_label: __("Manually Sent"),
-					secondary_action: function () {
-						d.hide();
-						frm.call("request_documents", { send_email: 0 }).then(() => frm.reload_doc());
-					},
+				_email_with_field_check(frm, {
+					title: "Request Documents",
+					method: "request_documents",
+					fields: [
+						{ fieldname: "email", label: "Email", fieldtype: "Data", options: "Email" },
+					],
 				});
-				d.$body.html(__("How was the document request sent to {0}?", [frm.doc.email]));
-				d.show();
 			}, __("Actions"));
 
 			frm.add_custom_button(__("Mark Documents Verified"), function () {
@@ -169,4 +154,58 @@ function _show_last_follow_up(frm) {
 		__("{0}: {1} — {2} ({3})", [label, dt, last.summary || "", last.call_result]),
 		color
 	);
+}
+
+function _email_with_field_check(frm, opts) {
+	var missing = [];
+	for (var f of opts.fields) {
+		if (!frm.doc[f.fieldname]) {
+			missing.push({
+				fieldname: f.fieldname,
+				fieldtype: f.fieldtype || "Data",
+				label: f.label,
+				options: f.options,
+				reqd: 1,
+			});
+		}
+	}
+
+	if (missing.length) {
+		var d = new frappe.ui.Dialog({
+			title: __(opts.title + " — Fill Required Fields"),
+			fields: missing,
+			primary_action_label: __("Save & Continue"),
+			primary_action: function (values) {
+				d.hide();
+				for (var key in values) {
+					frm.set_value(key, values[key]);
+				}
+				frm.save().then(() => {
+					_show_send_dialog(frm, opts);
+				});
+			},
+		});
+		d.show();
+		return;
+	}
+
+	_show_send_dialog(frm, opts);
+}
+
+function _show_send_dialog(frm, opts) {
+	var d = new frappe.ui.Dialog({
+		title: __(opts.title),
+		primary_action_label: __("Send Email"),
+		primary_action: function () {
+			d.hide();
+			frm.call(opts.method, { send_email: 1 }).then(() => frm.reload_doc());
+		},
+		secondary_action_label: __("Manually Sent"),
+		secondary_action: function () {
+			d.hide();
+			frm.call(opts.method, { send_email: 0 }).then(() => frm.reload_doc());
+		},
+	});
+	d.$body.html(__("Send {0} to {1}?", [opts.title, frm.doc.email]));
+	d.show();
 }

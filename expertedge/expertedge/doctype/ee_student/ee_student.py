@@ -185,16 +185,19 @@ class EEStudent(Document):
 		return si.name
 
 	@frappe.whitelist()
-	def create_payment_link(self, purpose, amount, currency=None, remarks=None):
+	def create_payment_link(self, purpose, amount, currency=None, remarks=None, sales_invoice=None):
 		"""Create a payment link with flexible purpose/amount/currency."""
-		self._ensure_invoice_exists()
+		invoice = sales_invoice or self.sales_invoice
+		if not invoice:
+			frappe.throw(_("Select an invoice to settle against."))
+
 		link = frappe.get_doc({
 			"doctype": "EE Nomod Payment Link",
 			"student": self.name,
 			"purpose": purpose,
 			"amount": flt(amount),
 			"currency": currency or self.billing_currency or "AED",
-			"sales_invoice": self.sales_invoice,
+			"sales_invoice": invoice,
 			"remarks": remarks,
 		})
 		link.insert(ignore_permissions=True)
@@ -202,10 +205,6 @@ class EEStudent(Document):
 		self._log_system_activity(f"Payment link {link.name} generated — {purpose} {currency or 'AED'} {flt(amount)}")
 		self.save(ignore_permissions=True)
 		return link.name
-
-	def _ensure_invoice_exists(self):
-		if not self.sales_invoice:
-			self.create_customer_and_invoice()
 
 	@frappe.whitelist()
 	def send_pre_approval_email(self, send_email=True):

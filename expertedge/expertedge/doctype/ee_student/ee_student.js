@@ -23,39 +23,49 @@ frappe.ui.form.on("EE Student", {
 				_show_payment_link_dialog(frm);
 			}, __("Billing"));
 
-			// Email buttons (Send Email / Manually Sent dialog)
-			function email_action_dialog(title, method, email) {
-				let d = new frappe.ui.Dialog({
-					title: __(title),
-					primary_action_label: __("Send Email"),
-					primary_action: function () {
-						d.hide();
-						frm.call(method, { send_email: 1 }).then(() => frm.reload_doc());
-					},
-					secondary_action_label: __("Manually Sent"),
-					secondary_action: function () {
-						d.hide();
-						frm.call(method, { send_email: 0 }).then(() => frm.reload_doc());
-					},
-				});
-				d.$body.html(__("How was this communicated to {0}?", [email]));
-				d.show();
-			}
-
+			// Email buttons with field validation
 			frm.add_custom_button(__("Send Pre-Approval Email"), function () {
-				email_action_dialog("Pre-Approval", "send_pre_approval_email", frm.doc.email);
+				_email_with_field_check(frm, {
+					title: "Pre-Approval Email",
+					method: "send_pre_approval_email",
+					fields: [
+						{ fieldname: "email", label: "Email", fieldtype: "Data", options: "Email" },
+						{ fieldname: "batch", label: "Batch", fieldtype: "Link", options: "EE Batch" },
+					],
+				});
 			}, __("Email"));
 
 			frm.add_custom_button(__("Send Receipt"), function () {
-				email_action_dialog("Payment Receipt", "send_receipt_email", frm.doc.email);
+				_email_with_field_check(frm, {
+					title: "Payment Receipt",
+					method: "send_receipt_email",
+					fields: [
+						{ fieldname: "email", label: "Email", fieldtype: "Data", options: "Email" },
+					],
+				});
 			}, __("Email"));
 
 			frm.add_custom_button(__("Send Balance Email"), function () {
-				email_action_dialog("Balance Payment", "send_balance_email", frm.doc.email);
+				_email_with_field_check(frm, {
+					title: "Balance Payment Email",
+					method: "send_balance_email",
+					fields: [
+						{ fieldname: "email", label: "Email", fieldtype: "Data", options: "Email" },
+					],
+				});
 			}, __("Email"));
 
 			frm.add_custom_button(__("Send Welcome Email"), function () {
-				email_action_dialog("Welcome Email", "send_welcome_email", frm.doc.email);
+				_email_with_field_check(frm, {
+					title: "Welcome Email",
+					method: "send_welcome_email",
+					fields: [
+						{ fieldname: "email", label: "Email", fieldtype: "Data", options: "Email" },
+						{ fieldname: "venue", label: "Venue", fieldtype: "Small Text" },
+						{ fieldname: "program_start_date", label: "Program Start Date", fieldtype: "Date" },
+						{ fieldname: "program_timing", label: "Timing", fieldtype: "Data" },
+					],
+				});
 			}, __("Email"));
 
 			// Mark CMA Registered
@@ -147,7 +157,7 @@ function _show_invoice_dialog(frm, open_payment_link_after) {
 				label: "Program Fee (AUD)",
 				default: default_aud,
 				reqd: 1,
-				description: "Enter the fee in AUD. AED amount will be computed.",
+				description: "Enter the full program fee agreed with the student. This creates a single invoice for the total amount. Partial payments can be collected via payment links.",
 			},
 			{
 				fieldname: "aud_conversion_rate",
@@ -318,6 +328,34 @@ function _show_payment_link_dialog(frm) {
 		title: __("Create Payment Link"),
 		fields: [
 			{
+				fieldname: "sales_invoice",
+				fieldtype: "Link",
+				label: "Against Invoice",
+				options: "Sales Invoice",
+				reqd: 1,
+				default: frm.doc.sales_invoice,
+				get_query: function () {
+					return {
+						filters: {
+							customer: frm.doc.customer,
+							docstatus: 1,
+							outstanding_amount: [">", 0],
+						},
+					};
+				},
+				description: "Select the invoice this payment will settle against.",
+				onchange: function () {
+					var si = d.get_value("sales_invoice");
+					if (si) {
+						frappe.db.get_value("Sales Invoice", si, "outstanding_amount", function (r) {
+							if (r) {
+								d.set_value("amount", r.outstanding_amount);
+							}
+						});
+					}
+				},
+			},
+			{
 				fieldname: "purpose",
 				fieldtype: "Select",
 				label: "Purpose",
@@ -333,6 +371,7 @@ function _show_payment_link_dialog(frm) {
 					? frm.doc.pre_approval_fee
 					: frm.doc.outstanding,
 				reqd: 1,
+				description: "Can be less than or equal to invoice outstanding. Overpayment creates unallocated credit.",
 			},
 			{
 				fieldname: "currency",
@@ -371,5 +410,59 @@ function _show_payment_link_dialog(frm) {
 			d.set_value("amount", frm.doc.net_fee || 0);
 		}
 	});
+	d.show();
+}
+
+function _email_with_field_check(frm, opts) {
+	var missing = [];
+	for (var f of opts.fields) {
+		if (!frm.doc[f.fieldname]) {
+			missing.push({
+				fieldname: f.fieldname,
+				fieldtype: f.fieldtype || "Data",
+				label: f.label,
+				options: f.options,
+				reqd: 1,
+			});
+		}
+	}
+
+	if (missing.length) {
+		var d = new frappe.ui.Dialog({
+			title: __(opts.title + " — Fill Required Fields"),
+			fields: missing,
+			primary_action_label: __("Save & Continue"),
+			primary_action: function (values) {
+				d.hide();
+				for (var key in values) {
+					frm.set_value(key, values[key]);
+				}
+				frm.save().then(() => {
+					_show_send_dialog(frm, opts);
+				});
+			},
+		});
+		d.show();
+		return;
+	}
+
+	_show_send_dialog(frm, opts);
+}
+
+function _show_send_dialog(frm, opts) {
+	var d = new frappe.ui.Dialog({
+		title: __(opts.title),
+		primary_action_label: __("Send Email"),
+		primary_action: function () {
+			d.hide();
+			frm.call(opts.method, { send_email: 1 }).then(() => frm.reload_doc());
+		},
+		secondary_action_label: __("Manually Sent"),
+		secondary_action: function () {
+			d.hide();
+			frm.call(opts.method, { send_email: 0 }).then(() => frm.reload_doc());
+		},
+	});
+	d.$body.html(__("Send {0} to {1}?", [opts.title, frm.doc.email]));
 	d.show();
 }

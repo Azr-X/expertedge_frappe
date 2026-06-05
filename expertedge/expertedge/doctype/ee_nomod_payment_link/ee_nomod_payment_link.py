@@ -132,9 +132,18 @@ class EENomodPaymentLink(Document):
 		if not settings.deposit_account:
 			frappe.throw(_("AED Deposit Account not set in ExpertEdge Settings"))
 
-		si = frappe.get_doc("Sales Invoice", student.sales_invoice)
+		invoice_name = self.sales_invoice or student.sales_invoice
+		if not invoice_name:
+			frappe.throw(_("No Sales Invoice linked. Create an invoice first."))
 
-		pe = frappe.get_doc({
+		si = frappe.get_doc("Sales Invoice", invoice_name)
+		payment_amount = flt(self.amount)
+		outstanding = flt(si.outstanding_amount)
+
+		# Cap allocation at invoice outstanding; excess stays as unallocated credit
+		allocated = min(payment_amount, outstanding) if outstanding > 0 else 0
+
+		pe_data = {
 			"doctype": "Payment Entry",
 			"payment_type": "Receive",
 			"party_type": "Customer",
@@ -142,18 +151,22 @@ class EENomodPaymentLink(Document):
 			"company": si.company,
 			"paid_from": si.debit_to,
 			"paid_to": settings.deposit_account,
-			"paid_amount": flt(self.amount),
-			"received_amount": flt(self.amount),
+			"paid_amount": payment_amount,
+			"received_amount": payment_amount,
 			"source_exchange_rate": 1,
 			"target_exchange_rate": 1,
 			"reference_no": self.nomod_reference or self.name,
 			"reference_date": now_datetime(),
-			"references": [{
+		}
+
+		if allocated > 0:
+			pe_data["references"] = [{
 				"reference_doctype": "Sales Invoice",
-				"reference_name": student.sales_invoice,
-				"allocated_amount": flt(self.amount),
-			}],
-		})
+				"reference_name": invoice_name,
+				"allocated_amount": allocated,
+			}]
+
+		pe = frappe.get_doc(pe_data)
 		pe.insert(ignore_permissions=True)
 		pe.submit()
 
