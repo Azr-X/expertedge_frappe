@@ -238,45 +238,51 @@ function _show_invoice_dialog(frm, open_payment_link_after) {
 function _add_follow_up_button(frm) {
 	frm.add_custom_button(__("Add Follow Up"), function () {
 		var d = new frappe.ui.Dialog({
-			title: __("Add Follow Up"),
+			title: __("Log Call / Follow Up"),
 			fields: [
 				{
-					fieldname: "activity_type",
+					fieldname: "direction",
 					fieldtype: "Select",
-					label: "Type",
-					options: "Note\nEmail\nWhatsApp\nMeeting",
-					default: "Note",
+					label: "Direction",
+					options: "Outbound\nInbound",
+					default: "Outbound",
 					reqd: 1,
+				},
+				{
+					fieldname: "call_result",
+					fieldtype: "Select",
+					label: "Result",
+					options: "Connected\nNo Answer\nBusy\nSwitched Off\nNot Reachable\nWrong Number\nCall Back Later\nInterested\nNot Interested\nFollow-up Scheduled",
+					reqd: 1,
+				},
+				{
+					fieldname: "duration_min",
+					fieldtype: "Float",
+					label: "Duration (min)",
 				},
 				{
 					fieldname: "summary",
 					fieldtype: "Small Text",
-					label: "Summary",
-					reqd: 1,
+					label: "Notes",
 				},
 				{
-					fieldname: "outcome",
-					fieldtype: "Data",
-					label: "Outcome",
-				},
-				{
-					fieldname: "follow_up_on",
+					fieldname: "next_call_on",
 					fieldtype: "Datetime",
-					label: "Follow-up On",
-					reqd: 1,
+					label: "Next Call On",
 					default: frappe.datetime.add_days(frappe.datetime.now_datetime(), 1),
 				},
 			],
 			primary_action_label: __("Save"),
 			primary_action: function (values) {
 				d.hide();
-				frm.add_child("activity_log", {
-					activity_on: frappe.datetime.now_datetime(),
-					activity_type: values.activity_type,
-					user: frappe.session.user,
+				frm.add_child("call_log", {
+					call_on: frappe.datetime.now_datetime(),
+					caller: frappe.session.user,
+					direction: values.direction,
+					call_result: values.call_result,
+					duration_min: values.duration_min,
 					summary: values.summary,
-					outcome: values.outcome,
-					follow_up_on: values.follow_up_on,
+					next_call_on: values.next_call_on,
 				});
 				frm.dirty();
 				frm.save().then(() => frm.reload_doc());
@@ -287,21 +293,22 @@ function _add_follow_up_button(frm) {
 }
 
 function _show_last_follow_up(frm) {
-	if (!frm.doc.activity_log || !frm.doc.activity_log.length) return;
+	if (!frm.doc.call_log || !frm.doc.call_log.length) return;
 
-	var follow_ups = frm.doc.activity_log.filter(
-		(r) => r.follow_up_on
-	).sort((a, b) => new Date(b.follow_up_on) - new Date(a.follow_up_on));
+	var with_next = frm.doc.call_log.filter(
+		(r) => r.next_call_on
+	).sort((a, b) => new Date(b.next_call_on) - new Date(a.next_call_on));
 
-	if (!follow_ups.length) return;
+	if (!with_next.length) return;
 
-	var last = follow_ups[0];
-	var dt = frappe.datetime.str_to_user(last.follow_up_on);
-	var is_past = frappe.datetime.get_diff(last.follow_up_on, frappe.datetime.now_datetime()) < 0;
+	var last = with_next[0];
+	var dt = frappe.datetime.str_to_user(last.next_call_on);
+	var is_past = frappe.datetime.get_diff(last.next_call_on, frappe.datetime.now_datetime()) < 0;
 	var color = is_past ? "orange" : "blue";
+	var label = is_past ? "Overdue follow-up" : "Next follow-up";
 
 	frm.set_intro(
-		__("Next follow-up: {0} — {1}", [dt, last.summary]),
+		__("{0}: {1} — {2} ({3})", [label, dt, last.summary || "", last.call_result]),
 		color
 	);
 }
