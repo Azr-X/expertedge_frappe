@@ -99,10 +99,23 @@ function _add_follow_up_button(frm) {
 			title: __("Add Follow Up"),
 			fields: [
 				{
+					fieldname: "activity_type",
+					fieldtype: "Select",
+					label: "Type",
+					options: "Note\nEmail\nWhatsApp\nMeeting",
+					default: "Note",
+					reqd: 1,
+				},
+				{
 					fieldname: "summary",
 					fieldtype: "Small Text",
-					label: "Note",
+					label: "Summary",
 					reqd: 1,
+				},
+				{
+					fieldname: "outcome",
+					fieldtype: "Data",
+					label: "Outcome",
 				},
 				{
 					fieldname: "follow_up_on",
@@ -115,11 +128,12 @@ function _add_follow_up_button(frm) {
 			primary_action_label: __("Save"),
 			primary_action: function (values) {
 				d.hide();
-				var row = frm.add_child("activity_log", {
+				frm.add_child("activity_log", {
 					activity_on: frappe.datetime.now_datetime(),
-					activity_type: "Follow Up",
+					activity_type: values.activity_type,
 					user: frappe.session.user,
 					summary: values.summary,
+					outcome: values.outcome,
 					follow_up_on: values.follow_up_on,
 				});
 				frm.dirty();
