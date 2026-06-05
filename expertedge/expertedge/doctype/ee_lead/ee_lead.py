@@ -25,8 +25,6 @@ class EELead(Document):
 		self._log_system_activity(f"Lead created via {self.lead_source}")
 
 	def validate(self):
-		if not self.handled_by and frappe.session.user != "Guest":
-			self.handled_by = frappe.session.user
 		self._guard_converted_status()
 		self._stamp_first_contact()
 		self._ensure_follow_up_todos()
@@ -125,8 +123,19 @@ class EELead(Document):
 		except Exception:
 			frappe.log_error("Failed to send new lead email to telecaller")
 
+	def _claim_handled_by(self):
+		"""Set handled_by to current user if not already set."""
+		if not self.handled_by and frappe.session.user not in ("Guest", "Administrator"):
+			self.handled_by = frappe.session.user
+
 	def _stamp_first_contact(self):
 		"""If call_log has rows and first_contacted_on is empty, stamp it."""
+		if self.call_log and not self.handled_by:
+			# Set handled_by from first caller
+			for row in self.call_log:
+				if row.caller:
+					self.handled_by = row.caller
+					break
 		if self.call_log and not self.first_contacted_on:
 			earliest = min(get_datetime(row.call_on) for row in self.call_log if row.call_on)
 			self.first_contacted_on = earliest
@@ -208,6 +217,7 @@ class EELead(Document):
 				reference_name=self.name,
 			)
 
+		self._claim_handled_by()
 		self.brochure_sent_on = now_datetime()
 		self.status = "Brochure Sent"
 		self._log_system_activity("Brochure " + ("emailed" if send_email else "marked sent via WhatsApp/other"))
@@ -238,6 +248,7 @@ class EELead(Document):
 				reference_name=self.name,
 			)
 
+		self._claim_handled_by()
 		self.docs_requested_on = now_datetime()
 		self.status = "Docs Requested"
 		self._log_system_activity("Document request " + ("emailed" if send_email else "marked sent manually"))
@@ -256,6 +267,7 @@ class EELead(Document):
 					  "Row {0} ({1}) is incomplete.").format(row.idx, row.document_type)
 				)
 
+		self._claim_handled_by()
 		self.documents_verified = 1
 		self.verified_by = frappe.session.user
 		self.docs_verified_on = now_datetime()
@@ -369,6 +381,7 @@ class EELead(Document):
 
 	@frappe.whitelist()
 	def confirm_lead(self):
+		self._claim_handled_by()
 		self.status = "Confirmed"
 		self.confirmed_on = now_datetime()
 		self.counselling_outcome = self.counselling_outcome or "Fit \u2013 Confirmed"
