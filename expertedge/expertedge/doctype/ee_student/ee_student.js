@@ -3,6 +3,8 @@ frappe.ui.form.on("EE Student", {
 		if (frm.is_new()) return;
 
 		frappe.whatsapp.add_button(frm, 'mobile_no');
+		_add_follow_up_button(frm);
+		_show_last_follow_up(frm);
 
 		if (frm.doc.status !== "Dropped") {
 			// Create Customer & Invoice — dialog with fee input
@@ -231,6 +233,63 @@ function _show_invoice_dialog(frm, open_payment_link_after) {
 	recalc();
 	recalc();
 	d.show();
+}
+
+function _add_follow_up_button(frm) {
+	frm.add_custom_button(__("Add Follow Up"), function () {
+		var d = new frappe.ui.Dialog({
+			title: __("Add Follow Up"),
+			fields: [
+				{
+					fieldname: "summary",
+					fieldtype: "Small Text",
+					label: "Note",
+					reqd: 1,
+				},
+				{
+					fieldname: "follow_up_on",
+					fieldtype: "Datetime",
+					label: "Follow-up On",
+					reqd: 1,
+					default: frappe.datetime.add_days(frappe.datetime.now_datetime(), 1),
+				},
+			],
+			primary_action_label: __("Save"),
+			primary_action: function (values) {
+				d.hide();
+				var row = frm.add_child("activity_log", {
+					activity_on: frappe.datetime.now_datetime(),
+					activity_type: "Follow Up",
+					user: frappe.session.user,
+					summary: values.summary,
+					follow_up_on: values.follow_up_on,
+				});
+				frm.dirty();
+				frm.save().then(() => frm.reload_doc());
+			},
+		});
+		d.show();
+	}).addClass("btn-primary");
+}
+
+function _show_last_follow_up(frm) {
+	if (!frm.doc.activity_log || !frm.doc.activity_log.length) return;
+
+	var follow_ups = frm.doc.activity_log.filter(
+		(r) => r.follow_up_on
+	).sort((a, b) => new Date(b.follow_up_on) - new Date(a.follow_up_on));
+
+	if (!follow_ups.length) return;
+
+	var last = follow_ups[0];
+	var dt = frappe.datetime.str_to_user(last.follow_up_on);
+	var is_past = frappe.datetime.get_diff(last.follow_up_on, frappe.datetime.now_datetime()) < 0;
+	var color = is_past ? "orange" : "blue";
+
+	frm.set_intro(
+		__("Next follow-up: {0} — {1}", [dt, last.summary]),
+		color
+	);
 }
 
 function _show_payment_link_dialog(frm) {
