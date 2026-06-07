@@ -18,7 +18,7 @@
  "list_columns": [],
  "login_required": 0,
  "max_attachment_size": 0,
- "modified": "2026-06-02 22:00:00.000000",
+ "modified": "2026-06-07 12:30:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "program-enquiry",
@@ -31,6 +31,21 @@
  "success_message": "Thank you for your enquiry! Our team will contact you soon.",
  "title": "Program Enquiry",
  "web_form_fields": [
+  {
+   "allow_read_on_all_link_options": 0,
+   "fieldname": "lead_source",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Lead Source",
+   "max_length": 0,
+   "max_value": 0,
+   "options": "EE Lead Source",
+   "precision": "",
+   "read_only": 1,
+   "default": "Program Enquiry",
+   "reqd": 0,
+   "show_in_filter": 0
+  },
   {
    "allow_read_on_all_link_options": 0,
    "fieldname": "lead_name",

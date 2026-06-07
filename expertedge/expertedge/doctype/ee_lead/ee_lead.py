@@ -12,14 +12,21 @@ class EELead(Document):
 		self._set_default_program()
 
 	def _set_web_form_defaults(self):
-		"""Auto-set lead_source for guest web form submissions."""
-		if frappe.session.user == "Guest" and not self.lead_source:
-			if frappe.db.exists("EE Lead Source", {"source_name": "Contact Form"}):
-				self.lead_source = "Contact Form"
-			elif frappe.db.exists("EE Lead Source", {"source_name": "Website"}):
+		"""Auto-set lead_source based on web form route."""
+		if not self.lead_source:
+			web_form = frappe.form_dict.get("web_form")
+			source_map = {
+				"quick-enquiry": "Quick Enquiry",
+				"program-enquiry": "Program Enquiry",
+			}
+			source = source_map.get(web_form)
+			if source and frappe.db.exists("EE Lead Source", source):
+				self.lead_source = source
+			elif frappe.db.exists("EE Lead Source", "Website"):
 				self.lead_source = "Website"
 
 	def after_insert(self):
+		self._tag_if_duplicate()
 		self._create_first_contact_todo()
 		self._notify_new_lead()
 		self._log_system_activity(f"Lead created via {self.lead_source}")
@@ -178,6 +185,29 @@ class EELead(Document):
 				"date": str(date)[:10] if date else nowdate(),
 				"status": "Open",
 			}).insert(ignore_permissions=True)
+
+	def _tag_if_duplicate(self):
+		"""Tag lead as Duplicate if another lead exists with same email or mobile."""
+		filters = [["name", "!=", self.name]]
+		or_filters = []
+		if self.email:
+			or_filters.append(["email", "=", self.email])
+		if self.mobile_no:
+			or_filters.append(["mobile_no", "=", self.mobile_no])
+
+		if not or_filters:
+			return
+
+		duplicates = frappe.get_all(
+			"EE Lead",
+			filters=filters,
+			or_filters=or_filters,
+			fields=["name"],
+			limit=1,
+		)
+		if duplicates:
+			from frappe.desk.doctype.tag.tag import add_tag
+			add_tag("Duplicate", "EE Lead", self.name)
 
 	def _log_system_activity(self, summary):
 		self.append("activity_log", {

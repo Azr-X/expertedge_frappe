@@ -11,11 +11,12 @@ def execute(filters=None):
 
 def get_columns():
 	return [
-		{"fieldname": "label", "label": "Lead", "fieldtype": "Data", "width": 300},
+		{"fieldname": "label", "label": "Lead", "fieldtype": "Data", "width": 250},
 		{"fieldname": "count", "label": "Count", "fieldtype": "Int", "width": 80},
 		{"fieldname": "status", "label": "Status", "fieldtype": "Data", "width": 130},
 		{"fieldname": "handled_by", "label": "Handled By", "fieldtype": "Data", "width": 160},
 		{"fieldname": "latest_notes", "label": "Latest Call Notes", "fieldtype": "Data", "width": 350},
+		{"fieldname": "lead_id", "label": "Lead ID", "fieldtype": "Link", "options": "EE Lead", "width": 120},
 	]
 
 
@@ -84,11 +85,12 @@ def get_data(filters):
 					handled_by_name = frappe.db.get_value("User", lead.handled_by, "full_name") or lead.handled_by
 
 				data.append({
-					"label": f"{lead.name}: {lead.lead_name}",
+					"label": lead.lead_name,
 					"count": "",
-						"status": lead.status,
+					"status": lead.status,
 					"handled_by": handled_by_name,
 					"latest_notes": latest_notes.get(lead.name, ""),
+					"lead_id": lead.name,
 					"indent": 2,
 				})
 

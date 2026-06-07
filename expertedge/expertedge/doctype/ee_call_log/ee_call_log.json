@@ -60,6 +60,7 @@
    "fieldname": "summary",
    "fieldtype": "Small Text",
    "label": "Notes",
+   "reqd": 1,
    "in_list_view": 1
   },
   {
@@ -74,7 +75,7 @@
   }
  ],
  "links": [],
- "modified": "2026-05-30 20:14:00.992767",
+ "modified": "2026-06-07 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "EE Call Log",

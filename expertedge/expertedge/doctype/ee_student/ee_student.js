@@ -282,6 +282,7 @@ function _add_follow_up_button(frm) {
 					fieldname: "summary",
 					fieldtype: "Small Text",
 					label: "Notes",
+					reqd: 1,
 				},
 				{
 					fieldname: "next_call_on",

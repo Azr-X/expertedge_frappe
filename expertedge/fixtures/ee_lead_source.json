@@ -33,5 +33,19 @@
   "source_name": "Website",
   "channel": "Organic",
   "is_active": 1
+ },
+ {
+  "doctype": "EE Lead Source",
+  "name": "Quick Enquiry",
+  "source_name": "Quick Enquiry",
+  "channel": "Organic",
+  "is_active": 1
+ },
+ {
+  "doctype": "EE Lead Source",
+  "name": "Program Enquiry",
+  "source_name": "Program Enquiry",
+  "channel": "Organic",
+  "is_active": 1
  }
 ]
