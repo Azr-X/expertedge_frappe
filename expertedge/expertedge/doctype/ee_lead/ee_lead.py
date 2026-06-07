@@ -127,11 +127,13 @@ class EELead(Document):
 
 		try:
 			frappe.sendmail(
-				recipients=recipients,
+				recipients=[recipients[0]],
+				cc=recipients[1:] if len(recipients) > 1 else [],
 				subject=subject,
 				message=message,
 				reference_doctype="EE Lead",
 				reference_name=self.name,
+				expose_recipients="header",
 			)
 		except Exception:
 			frappe.log_error("Failed to send new lead notification email")
