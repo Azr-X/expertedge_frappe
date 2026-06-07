@@ -1,0 +1,20 @@
+<div class="lead-analysis-page">
+	<div class="filter-bar" style="display:flex;gap:12px;align-items:flex-end;margin-bottom:16px;">
+		<div id="from-date-filter" style="width:160px;"></div>
+		<div id="to-date-filter" style="width:160px;"></div>
+		<div style="flex:1;"></div>
+		<button class="btn btn-default btn-sm" id="btn-clear" style="display:none;">Clear Filters</button>
+		<button class="btn btn-primary btn-sm" id="btn-refresh">Refresh</button>
+	</div>
+	<div class="active-filters" id="active-filters" style="margin-bottom:12px;display:none;">
+		<span class="text-muted" id="filter-tags"></span>
+	</div>
+	<div class="slicer-row" style="display:flex;gap:16px;margin-bottom:16px;">
+		<div class="slicer-table" style="flex:1;" id="date-slicer"></div>
+		<div class="slicer-table" style="flex:1;" id="source-slicer"></div>
+	</div>
+	<div style="display:flex;gap:16px;">
+		<div id="leads-table" style="flex:1;min-width:0;"></div>
+		<div id="lead-detail" style="width:380px;display:none;"></div>
+	</div>
+</div>
