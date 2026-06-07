@@ -225,7 +225,7 @@ class EELead(Document):
 
 	@frappe.whitelist()
 	def send_brochure(self, send_email=True):
-		send_email = frappe.parse_val(send_email)
+		send_email = frappe.utils.sbool(send_email)
 
 		if not self.preferred_batch:
 			frappe.throw(_("Set Preferred Batch before sending brochure"))
@@ -265,7 +265,7 @@ class EELead(Document):
 
 	@frappe.whitelist()
 	def request_documents(self, send_email=True):
-		send_email = frappe.parse_val(send_email)
+		send_email = frappe.utils.sbool(send_email)
 
 		if send_email:
 			settings = frappe.get_cached_doc("ExpertEdge Settings")

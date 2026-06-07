@@ -223,7 +223,7 @@ class EEStudent(Document):
 		self._send_template_email("welcome_email_template", "Welcome email", send_email)
 
 	def _send_template_email(self, template_field, label, send_email=True):
-		send_email = frappe.parse_val(send_email)
+		send_email = frappe.utils.sbool(send_email)
 
 		if send_email:
 			settings = frappe.get_cached_doc("ExpertEdge Settings")
