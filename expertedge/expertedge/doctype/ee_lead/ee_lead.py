@@ -90,16 +90,22 @@ class EELead(Document):
 	def _notify_new_lead(self):
 		settings = frappe.get_cached_doc("ExpertEdge Settings")
 		sla_minutes = settings.first_contact_sla_minutes or 30
-		allocated_to = self.handled_by or self.owner
-		frappe.publish_realtime(
-			"msgprint",
-			{"message": f"New lead {self.lead_name} — call within {sla_minutes} min", "alert": True},
-			user=allocated_to,
-		)
-		self._email_telecaller_new_lead(settings, allocated_to, sla_minutes)
+		recipients = [
+			row.user for row in (settings.email_recipients or [])
+			if row.email_type == "New Lead Notification"
+		]
+		if not recipients:
+			return
+		for user in recipients:
+			frappe.publish_realtime(
+				"msgprint",
+				{"message": f"New lead {self.lead_name} — call within {sla_minutes} min", "alert": True},
+				user=user,
+			)
+		self._email_telecaller_new_lead(settings, recipients, sla_minutes)
 
-	def _email_telecaller_new_lead(self, settings, allocated_to, sla_minutes):
-		"""Send email to telecaller about new lead assignment."""
+	def _email_telecaller_new_lead(self, settings, recipients, sla_minutes):
+		"""Send email to configured recipients about new lead."""
 		template_name = settings.get("new_lead_email_template")
 
 		if template_name:
@@ -108,9 +114,9 @@ class EELead(Document):
 			message = frappe.render_template(template.response_html or template.response, context)
 			subject = frappe.render_template(template.subject, context)
 		else:
-			subject = f"New Lead Assigned: {self.lead_name}"
+			subject = f"New Lead: {self.lead_name}"
 			message = (
-				f"<p>A new lead has been assigned to you.</p>"
+				f"<p>A new lead has been created.</p>"
 				f"<p><strong>Name:</strong> {self.lead_name}<br>"
 				f"<strong>Email:</strong> {self.email or 'N/A'}<br>"
 				f"<strong>Mobile:</strong> {self.mobile_no or 'N/A'}<br>"
@@ -121,14 +127,14 @@ class EELead(Document):
 
 		try:
 			frappe.sendmail(
-				recipients=[allocated_to],
+				recipients=recipients,
 				subject=subject,
 				message=message,
 				reference_doctype="EE Lead",
 				reference_name=self.name,
 			)
 		except Exception:
-			frappe.log_error("Failed to send new lead email to telecaller")
+			frappe.log_error("Failed to send new lead notification email")
 
 	def _claim_handled_by(self):
 		"""Set handled_by to current user if not already set."""
