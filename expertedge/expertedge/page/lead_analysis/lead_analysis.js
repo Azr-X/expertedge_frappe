@@ -13,6 +13,7 @@ frappe.pages["lead-analysis"].on_page_load = function (wrapper) {
 		selected_date: null,
 		selected_source: null,
 		selected_lead: null,
+		selected_status: null,
 		all_leads: [],
 	};
 
@@ -31,11 +32,27 @@ frappe.pages["lead-analysis"].on_page_load = function (wrapper) {
 	});
 	to_ctrl.set_value(state.to_date);
 
+	var status_ctrl = frappe.ui.form.make_control({
+		df: {
+			fieldname: "status",
+			fieldtype: "Select",
+			label: "Status",
+			options: "\nNew\nContacted\nBrochure Sent\nDocs Requested\nDocs Received\nDocs Verified\nCounselling Scheduled\nCounselling Done\nConfirmed\nConverted\nLost",
+		},
+		parent: page.main.find("#status-filter"),
+		render_input: true,
+	});
+	status_ctrl.$input.on("change", function () {
+		state.selected_status = status_ctrl.get_value();
+		render_all();
+	});
+
 	page.main.find("#btn-refresh").on("click", function () {
 		state.from_date = from_ctrl.get_value();
 		state.to_date = to_ctrl.get_value();
 		state.selected_date = null;
 		state.selected_source = null;
+		state.selected_status = status_ctrl.get_value();
 		fetch_data();
 	});
 
@@ -64,8 +81,15 @@ frappe.pages["lead-analysis"].on_page_load = function (wrapper) {
 		update_filter_tags();
 	}
 
+	function apply_status_filter(leads) {
+		if (state.selected_status) {
+			return leads.filter((l) => l.status === state.selected_status);
+		}
+		return leads;
+	}
+
 	function get_filtered_leads() {
-		var leads = state.all_leads;
+		var leads = apply_status_filter(state.all_leads);
 		if (state.selected_date) {
 			leads = leads.filter((l) => l.lead_date === state.selected_date);
 		}
@@ -76,8 +100,7 @@ frappe.pages["lead-analysis"].on_page_load = function (wrapper) {
 	}
 
 	function get_date_filtered_leads() {
-		// Only date filter applied (for source slicer counts)
-		var leads = state.all_leads;
+		var leads = apply_status_filter(state.all_leads);
 		if (state.selected_date) {
 			leads = leads.filter((l) => l.lead_date === state.selected_date);
 		}
@@ -85,8 +108,7 @@ frappe.pages["lead-analysis"].on_page_load = function (wrapper) {
 	}
 
 	function get_source_filtered_leads() {
-		// Only source filter applied (for date slicer counts)
-		var leads = state.all_leads;
+		var leads = apply_status_filter(state.all_leads);
 		if (state.selected_source) {
 			leads = leads.filter((l) => l.lead_source === state.selected_source);
 		}
