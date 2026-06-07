@@ -18,11 +18,12 @@ def get_lead_data(from_date, to_date):
 	)
 
 	lead_names = [l.name for l in leads]
-	notes_map = get_latest_call_notes(lead_names)
+	notes_map, dates_map = get_latest_call_notes(lead_names)
 	user_names = get_user_full_names(set(l.handled_by for l in leads if l.handled_by))
 
 	result = []
 	for lead in leads:
+		last_call = dates_map.get(lead.name)
 		result.append({
 			"name": lead.name,
 			"lead_name": lead.lead_name,
@@ -32,6 +33,7 @@ def get_lead_data(from_date, to_date):
 			"handled_by_name": user_names.get(lead.handled_by, ""),
 			"lead_date": str(getdate(lead.lead_received_on)),
 			"latest_notes": notes_map.get(lead.name, ""),
+			"last_call_date": str(getdate(last_call)) if last_call else "",
 		})
 
 	return result
@@ -39,21 +41,24 @@ def get_lead_data(from_date, to_date):
 
 def get_latest_call_notes(lead_names):
 	if not lead_names:
-		return {}
+		return {}, {}
 
 	logs = frappe.db.sql("""
-		SELECT parent, summary
+		SELECT parent, summary, call_on
 		FROM `tabEE Call Log`
 		WHERE parent IN %(leads)s
 		ORDER BY call_on DESC, idx DESC
 	""", {"leads": lead_names}, as_dict=True)
 
-	result = {}
+	notes = {}
+	dates = {}
 	for log in logs:
-		if log.parent not in result and log.summary:
-			result[log.parent] = log.summary
+		if log.parent not in notes and log.summary:
+			notes[log.parent] = log.summary
+		if log.parent not in dates and log.call_on:
+			dates[log.parent] = log.call_on
 
-	return result
+	return notes, dates
 
 
 def get_user_full_names(users):

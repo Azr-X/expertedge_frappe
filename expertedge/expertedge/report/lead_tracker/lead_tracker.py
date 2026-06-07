@@ -15,6 +15,7 @@ def get_columns():
 		{"fieldname": "count", "label": "Count", "fieldtype": "Int", "width": 80},
 		{"fieldname": "status", "label": "Status", "fieldtype": "Data", "width": 130},
 		{"fieldname": "handled_by", "label": "Handled By", "fieldtype": "Data", "width": 160},
+		{"fieldname": "last_call_date", "label": "Last Call", "fieldtype": "Date", "width": 110},
 		{"fieldname": "latest_notes", "label": "Latest Call Notes", "fieldtype": "Data", "width": 350},
 		{"fieldname": "lead_id", "label": "Lead ID", "fieldtype": "Link", "options": "EE Lead", "width": 120},
 	]
@@ -42,8 +43,8 @@ def get_data(filters):
 		limit_page_length=0,
 	)
 
-	# Get latest call log summary for all leads in one query
-	latest_notes = get_latest_call_notes([l.name for l in leads])
+	# Get latest call log summary and date for all leads in one query
+	latest_notes, last_call_dates = get_latest_call_notes([l.name for l in leads])
 
 	# Group by date -> source
 	tree = OrderedDict()
@@ -84,11 +85,13 @@ def get_data(filters):
 				if lead.handled_by:
 					handled_by_name = frappe.db.get_value("User", lead.handled_by, "full_name") or lead.handled_by
 
+				last_call = last_call_dates.get(lead.name)
 				data.append({
 					"label": lead.lead_name,
 					"count": "",
 					"status": lead.status,
 					"handled_by": handled_by_name,
+					"last_call_date": getdate(last_call) if last_call else None,
 					"latest_notes": latest_notes.get(lead.name, ""),
 					"lead_id": lead.name,
 					"indent": 2,
@@ -98,21 +101,24 @@ def get_data(filters):
 
 
 def get_latest_call_notes(lead_names):
-	"""Get the latest call log summary for each lead in bulk."""
+	"""Get the latest call log summary and date for each lead in bulk."""
 	if not lead_names:
-		return {}
+		return {}, {}
 
 	# EE Call Log is child table of EE Lead, parent field = "parent"
 	logs = frappe.db.sql("""
-		SELECT parent, summary
+		SELECT parent, summary, call_on
 		FROM `tabEE Call Log`
 		WHERE parent IN %(leads)s
 		ORDER BY call_on DESC, idx DESC
 	""", {"leads": lead_names}, as_dict=True)
 
-	result = {}
+	notes = {}
+	dates = {}
 	for log in logs:
-		if log.parent not in result and log.summary:
-			result[log.parent] = log.summary
+		if log.parent not in notes and log.summary:
+			notes[log.parent] = log.summary
+		if log.parent not in dates and log.call_on:
+			dates[log.parent] = log.call_on
 
-	return result
+	return notes, dates

@@ -199,6 +199,7 @@ frappe.pages["lead-analysis"].on_page_load = function (wrapper) {
 				<td>${frappe.utils.escape_html(l.lead_source || "")}</td>
 				<td><span class="indicator-pill ${status_color}">${frappe.utils.escape_html(l.status || "")}</span></td>
 				<td>${frappe.utils.escape_html(l.handled_by_name || "")}</td>
+				<td>${l.last_call_date ? frappe.datetime.str_to_user(l.last_call_date) : ""}</td>
 				<td>${frappe.utils.escape_html(l.latest_notes || "")}</td>
 			</tr>`;
 			})
@@ -212,9 +213,10 @@ frappe.pages["lead-analysis"].on_page_load = function (wrapper) {
 					<th>Source</th>
 					<th>Status</th>
 					<th>Handled By</th>
+					<th>Last Call</th>
 					<th>Latest Notes</th>
 				</tr></thead>
-				<tbody>${rows || '<tr><td colspan="6" class="text-muted text-center">No leads found</td></tr>'}</tbody>
+				<tbody>${rows || '<tr><td colspan="7" class="text-muted text-center">No leads found</td></tr>'}</tbody>
 			</table>
 			<div style="padding:8px 12px;font-size:12px;color:var(--text-muted);">${leads.length} leads</div>
 		</div>`;
