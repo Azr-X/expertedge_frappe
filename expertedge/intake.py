@@ -22,10 +22,8 @@ def create_lead(payload):
 	if not email and not mobile:
 		frappe.throw(_("Email or Mobile is required to create a lead"))
 
-	# De-dupe check
-	filters = {
-		"status": ["not in", ["Lost", "Converted"]],
-	}
+	# De-dupe check — match ALL statuses to prevent re-creating Lost/Converted leads
+	filters = {}
 	or_filters = []
 	if email:
 		or_filters.append({"email": email})

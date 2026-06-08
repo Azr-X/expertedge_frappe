@@ -60,6 +60,21 @@ def _clean_phone(phone_str):
 	return phone.strip()
 
 
+def _normalize_phone(phone_str):
+	"""Normalize phone to digits-only for dedup comparison.
+
+	Strips +, spaces, dashes, parens, leading 00. Returns last 9 digits
+	which are the subscriber number (works for most GCC/Indian numbers).
+	"""
+	if not phone_str:
+		return ""
+	digits = re.sub(r"[^\d]", "", phone_str)
+	if digits.startswith("00"):
+		digits = digits[2:]
+	# Last 9 digits = subscriber number (avoids country code mismatches)
+	return digits[-9:] if len(digits) >= 9 else digits
+
+
 def _map_platform(platform_str):
 	"""Map platform code to EE Lead Source name."""
 	return PLATFORM_MAP.get((platform_str or "").lower().strip(), platform_str or "")
@@ -71,7 +86,11 @@ def _map_experience(exp_str):
 
 
 def _lead_exists(sheet_lead_id=None, email=None, mobile_no=None):
-	"""Check if lead already exists by sheet_lead_id, email, or mobile."""
+	"""Check if lead already exists by sheet_lead_id, email, or normalized mobile.
+
+	Checks ALL statuses (including Lost/Converted) to prevent re-importing
+	the same person as a new lead.
+	"""
 	if sheet_lead_id:
 		existing = frappe.db.exists("EE Lead", {"sheet_lead_id": sheet_lead_id})
 		if existing:
@@ -80,20 +99,30 @@ def _lead_exists(sheet_lead_id=None, email=None, mobile_no=None):
 	if email:
 		existing = frappe.db.get_value(
 			"EE Lead",
-			{"email": email, "status": ["not in", ["Lost", "Converted"]]},
+			{"email": email.lower()},
 			"name",
 		)
 		if existing:
 			return existing
 
 	if mobile_no:
-		existing = frappe.db.get_value(
-			"EE Lead",
-			{"mobile_no": mobile_no, "status": ["not in", ["Lost", "Converted"]]},
-			"name",
-		)
+		# Exact match first
+		existing = frappe.db.get_value("EE Lead", {"mobile_no": mobile_no}, "name")
 		if existing:
 			return existing
+
+		# Normalized match — compare last 9 digits
+		norm = _normalize_phone(mobile_no)
+		if norm and len(norm) >= 7:
+			all_leads = frappe.get_all(
+				"EE Lead",
+				filters={"mobile_no": ["is", "set"]},
+				fields=["name", "mobile_no"],
+				limit_page_length=0,
+			)
+			for lead in all_leads:
+				if _normalize_phone(lead.mobile_no) == norm:
+					return lead.name
 
 	return None
 
@@ -126,7 +155,7 @@ def sync_leads_from_sheet():
 	for row in reader:
 		try:
 			sheet_lead_id = (row.get("id") or "").strip()
-			email = (row.get("email") or "").strip()
+			email = (row.get("email") or "").strip().lower()
 			phone = _clean_phone(row.get("phone_number"))
 			full_name = (row.get("full_name") or "").strip()
 
@@ -196,10 +225,17 @@ def sync_leads_from_sheet():
 			if lead_received_on:
 				lead.lead_received_on = lead_received_on
 
-			lead.insert(ignore_permissions=True)
+			frappe.flags.skip_duplicate_lead_throw = True
+			try:
+				lead.insert(ignore_permissions=True)
+			finally:
+				frappe.flags.skip_duplicate_lead_throw = False
 			frappe.db.commit()
 			created += 1
 
+		except frappe.DuplicateEntryError:
+			# Silently skip — duplicate caught by EE Lead before_insert
+			frappe.db.rollback()
 		except Exception:
 			frappe.log_error(
 				title=f"Google Sheet lead import error: {row.get('id', 'unknown')}",

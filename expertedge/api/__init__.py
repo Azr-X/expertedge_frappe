@@ -48,17 +48,17 @@ def create_lead(lead_name, email, phone, country, program, phone_code="+91", sta
 	# Resolve lead source
 	lead_source = frappe.db.exists("EE Lead Source", source) or "Website"
 
-	# Check duplicate: same email + same program = return existing
-	existing = frappe.db.get_value(
-		"EE Lead",
-		{"email": email, "program": program_doc} if program_doc else {"email": email},
-		"name",
-	)
-	if existing:
-		return {"status": "ok", "lead": existing, "duplicate": True}
-
 	# Build mobile number with country code
 	mobile = f"{phone_code}{phone}" if not phone.startswith("+") else phone
+
+	# Check duplicate: same email or same mobile = return existing
+	dup_or_filters = [{"email": email}] if email else []
+	if mobile:
+		dup_or_filters.append({"mobile_no": mobile})
+	if dup_or_filters:
+		existing = frappe.get_all("EE Lead", or_filters=dup_or_filters, fields=["name"], limit=1)
+		if existing:
+			return {"status": "ok", "lead": existing[0].name, "duplicate": True}
 
 	lead = frappe.get_doc({
 		"doctype": "EE Lead",

@@ -6,6 +6,7 @@ from frappe.utils import now_datetime, get_datetime, nowdate
 
 class EELead(Document):
 	def before_insert(self):
+		self._check_duplicate()
 		self.lead_received_on = now_datetime()
 		self._set_web_form_defaults()
 		self._seed_mandatory_documents()
@@ -26,7 +27,6 @@ class EELead(Document):
 				self.lead_source = "Website"
 
 	def after_insert(self):
-		self._tag_if_duplicate()
 		self._create_first_contact_todo()
 		self._notify_new_lead()
 		self._log_system_activity(f"Lead created via {self.lead_source}")
@@ -194,12 +194,11 @@ class EELead(Document):
 				"status": "Open",
 			}).insert(ignore_permissions=True)
 
-	def _tag_if_duplicate(self):
-		"""Tag lead as Duplicate if another lead exists with same email or mobile."""
-		filters = [["name", "!=", self.name]]
+	def _check_duplicate(self):
+		"""Block creation if lead with same email or mobile already exists."""
 		or_filters = []
 		if self.email:
-			or_filters.append(["email", "=", self.email])
+			or_filters.append(["email", "=", self.email.lower()])
 		if self.mobile_no:
 			or_filters.append(["mobile_no", "=", self.mobile_no])
 
@@ -208,14 +207,28 @@ class EELead(Document):
 
 		duplicates = frappe.get_all(
 			"EE Lead",
-			filters=filters,
 			or_filters=or_filters,
-			fields=["name"],
+			fields=["name", "lead_name", "status"],
 			limit=1,
 		)
-		if duplicates:
-			from frappe.desk.doctype.tag.tag import add_tag
-			add_tag("Duplicate", "EE Lead", self.name)
+		if not duplicates:
+			return
+
+		existing = duplicates[0]
+		# Automated imports (google sheet sync, intake API) — set flag to skip silently
+		if getattr(frappe.flags, "skip_duplicate_lead_throw", False):
+			frappe.flags.duplicate_lead_name = existing.name
+			raise frappe.DuplicateEntryError(self.doctype, self.email or self.mobile_no, existing.name)
+
+		# Manual creation — throw with link to existing lead
+		lead_link = f'<a href="/app/ee-lead/{existing.name}">{existing.name} — {existing.lead_name} ({existing.status})</a>'
+		frappe.throw(
+			_("A lead already exists with the same {0}: {1}").format(
+				"email" if self.email and self.email.lower() == (frappe.db.get_value("EE Lead", existing.name, "email") or "").lower() else "mobile number",
+				lead_link,
+			),
+			title=_("Duplicate Lead"),
+		)
 
 	def _log_system_activity(self, summary):
 		self.append("activity_log", {
