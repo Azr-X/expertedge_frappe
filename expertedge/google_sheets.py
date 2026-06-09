@@ -86,34 +86,29 @@ def _map_experience(exp_str):
 
 
 def _lead_exists(sheet_lead_id=None, email=None, mobile_no=None):
-	"""Check if lead already exists by sheet_lead_id, email, or normalized mobile.
+	"""Check if lead already exists by email, normalized mobile, or sheet_lead_id.
 
-	Checks ALL statuses (including Lost/Converted) to prevent re-importing
-	the same person as a new lead.
+	Email and phone checked FIRST — these are the real identity.
+	sheet_lead_id is a fallback for leads with placeholder emails and no phone.
 	"""
-	if sheet_lead_id:
-		existing = frappe.db.exists("EE Lead", {"sheet_lead_id": sheet_lead_id})
-		if existing:
-			return existing
-
-	if email:
-		existing = frappe.db.get_value(
-			"EE Lead",
-			{"email": email.lower()},
-			"name",
+	# Email check — case-insensitive via LIKE or LOWER
+	if email and not email.startswith("noemail-"):
+		existing = frappe.db.sql(
+			"SELECT name FROM `tabEE Lead` WHERE LOWER(email) = %s LIMIT 1",
+			email.lower(),
 		)
 		if existing:
-			return existing
+			return existing[0][0]
 
+	# Phone check — normalized (last 9 digits)
 	if mobile_no:
-		# Exact match first
-		existing = frappe.db.get_value("EE Lead", {"mobile_no": mobile_no}, "name")
-		if existing:
-			return existing
-
-		# Normalized match — compare last 9 digits
 		norm = _normalize_phone(mobile_no)
 		if norm and len(norm) >= 7:
+			# Exact match first (fast)
+			existing = frappe.db.get_value("EE Lead", {"mobile_no": mobile_no}, "name")
+			if existing:
+				return existing
+			# Normalized scan
 			all_leads = frappe.get_all(
 				"EE Lead",
 				filters={"mobile_no": ["is", "set"]},
@@ -123,6 +118,12 @@ def _lead_exists(sheet_lead_id=None, email=None, mobile_no=None):
 			for lead in all_leads:
 				if _normalize_phone(lead.mobile_no) == norm:
 					return lead.name
+
+	# sheet_lead_id fallback
+	if sheet_lead_id:
+		existing = frappe.db.exists("EE Lead", {"sheet_lead_id": sheet_lead_id})
+		if existing:
+			return existing
 
 	return None
 
