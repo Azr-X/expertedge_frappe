@@ -5,3 +5,4 @@
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
 expertedge.patches.merge_duplicate_leads
+expertedge.patches.merge_duplicate_leads_v2
