@@ -26,5 +26,13 @@
   "role_name": "EE Manager",
   "desk_access": 1,
   "is_custom": 1
+ },
+ {
+  "doctype": "Role",
+  "name": "EE Marketing",
+  "role_name": "EE Marketing",
+  "desk_access": 1,
+  "is_custom": 1,
+  "home_page": "/app/marketing"
  }
 ]

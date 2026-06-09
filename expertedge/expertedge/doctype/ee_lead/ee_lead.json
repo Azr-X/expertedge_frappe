@@ -87,6 +87,7 @@
    "label": "Email",
    "options": "Email",
    "reqd": 1,
+   "unique": 1,
    "in_list_view": 1
   },
   {
@@ -94,7 +95,8 @@
    "fieldtype": "Data",
    "label": "Mobile No",
    "options": "Phone",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "date_of_birth",
@@ -412,7 +414,7 @@
   }
  ],
  "links": [],
- "modified": "2026-06-02 12:00:00.000000",
+ "modified": "2026-06-09 15:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "EE Lead",
@@ -445,6 +447,11 @@
   {
    "role": "EE Finance",
    "read": 1
+  },
+  {
+   "role": "EE Marketing",
+   "read": 1,
+   "report": 1
   },
   {
    "role": "EE Manager",

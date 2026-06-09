@@ -21,7 +21,7 @@ fixtures = [
 	},
 	{
 		"dt": "Role",
-		"filters": [["name", "in", ["EE Telecaller", "EE Academic Counsellor", "EE Finance", "EE Manager"]]],
+		"filters": [["name", "in", ["EE Telecaller", "EE Academic Counsellor", "EE Finance", "EE Manager", "EE Marketing"]]],
 	},
 	{
 		"dt": "Email Template",
@@ -33,7 +33,7 @@ fixtures = [
 	},
 	{
 		"dt": "Custom DocPerm",
-		"filters": [["role", "in", ["EE Telecaller", "EE Academic Counsellor", "EE Finance", "EE Manager"]]],
+		"filters": [["role", "in", ["EE Telecaller", "EE Academic Counsellor", "EE Finance", "EE Manager", "EE Marketing"]]],
 	},
 ]
 

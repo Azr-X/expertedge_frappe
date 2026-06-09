@@ -71,6 +71,9 @@ frappe.pages["lead-analysis"].on_page_load = function (wrapper) {
 				state.all_leads = r.message || [];
 				render_all();
 			},
+			error: function () {
+				frappe.msgprint(__("Unable to load lead data. Please check your permissions."));
+			},
 		});
 	}
 
@@ -246,6 +249,9 @@ frappe.pages["lead-analysis"].on_page_load = function (wrapper) {
 					render_lead_detail(r.message);
 				}
 			},
+			error: function () {
+				// silently ignore — user may not have detail access
+			},
 		});
 	}
 
@@ -290,10 +296,13 @@ frappe.pages["lead-analysis"].on_page_load = function (wrapper) {
 			</div>`;
 		}).join("");
 
+		var open_btn = frappe.boot.user.can_read.includes("EE Lead")
+			? `<a href="/app/ee-lead/${d.name}" class="btn btn-xs btn-default">Open</a>`
+			: "";
 		var html = `<div class="detail-card">
 			<div class="detail-header">
 				<h6>${frappe.utils.escape_html(d.lead_name)}</h6>
-				<a href="/app/ee-lead/${d.name}" class="btn btn-xs btn-default">Open</a>
+				${open_btn}
 			</div>
 			<div class="detail-body">
 				${detail_rows}
