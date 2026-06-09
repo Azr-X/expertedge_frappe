@@ -82,3 +82,15 @@ Official India partner for CMA Australia & New Zealand. Leads from ads → quali
 
 
 test
+
+
+#!/bin/bash                                                                                                                                                                                                                                                 
+echo "=== Deploy started at $(date) ===" >> ~/frappe-bench/logs/deploy.log
+cd ~/frappe-bench/apps/expertedge                                                                                                                                                                                                                           
+git pull >> ~/frappe-bench/logs/deploy.log 2>&1                                                                                                                                                                                                           
+cd ~/frappe-bench                                                                                                                                                                                                                                           
+bench --site erp.expertedge.info migrate >> ~/frappe-bench/logs/deploy.log 2>&1
+bench --site erp.expertedge.info clear-cache >> ~/frappe-bench/logs/deploy.log 2>&1                                                                                                                                                                         
+bench build --app expertedge >> ~/frappe-bench/logs/deploy.log 2>&1
+sudo supervisorctl restart all >> ~/frappe-bench/logs/deploy.log 2>&1                                                                                                                                                                                       
+echo "=== Deploy finished at $(date) ===" >> ~/frappe-bench/logs/deploy.log
