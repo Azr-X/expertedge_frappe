@@ -17,6 +17,7 @@
   "end_time",
   "venue",
   "section_details",
+  "course_material",
   "description"
  ],
  "fields": [
@@ -89,6 +90,13 @@
    "fieldname": "section_details",
    "fieldtype": "Section Break",
    "label": "Details"
+  },
+  {
+   "fieldname": "course_material",
+   "fieldtype": "Link",
+   "label": "Course Material",
+   "options": "EE Course Material",
+   "description": "Link to syllabus or assignment for this session"
   },
   {
    "fieldname": "description",

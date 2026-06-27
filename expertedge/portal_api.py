@@ -545,7 +545,7 @@ def get_schedule(token, from_date=None, to_date=None):
 		"EE Schedule Entry",
 		filters=filters,
 		fields=["name", "title", "session_type", "date", "start_time",
-				"end_time", "venue", "instructor", "description"],
+				"end_time", "venue", "instructor", "description", "course_material"],
 		order_by="date asc, start_time asc",
 		limit=50,
 	)
