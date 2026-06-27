@@ -38,10 +38,15 @@ def _get_student_by_token(token):
 	"""Look up student by auth_token. Returns doc or throws."""
 	if not token:
 		frappe.throw(_("Invalid or expired token"), frappe.AuthenticationError)
-	student_name = frappe.db.get_value("EE Student", {"auth_token": token, "portal_enabled": 1}, "name")
-	if not student_name:
+	# Use SQL directly — frappe.db.get_value can have issues with unique Data fields
+	result = frappe.db.sql(
+		"SELECT name FROM `tabEE Student` WHERE auth_token = %s AND portal_enabled = 1 LIMIT 1",
+		(token,),
+		as_dict=True,
+	)
+	if not result:
 		frappe.throw(_("Invalid or expired token"), frappe.AuthenticationError)
-	return frappe.get_doc("EE Student", student_name)
+	return frappe.get_doc("EE Student", result[0].name)
 
 
 def _haversine(lat1, lon1, lat2, lon2):
