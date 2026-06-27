@@ -293,6 +293,101 @@ class EEStudent(Document):
 			frappe.flags.in_student_fully_paid = False
 
 	@frappe.whitelist()
+	def enable_portal_access(self, send_email=True):
+		"""Generate random password, enable portal, email credentials to student."""
+		import hashlib
+		import secrets as _secrets
+
+		if not self.email:
+			frappe.throw(_("Student email is required to enable portal access"))
+
+		password = _secrets.token_urlsafe(8)
+		salt = _secrets.token_hex(16)
+		h = hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), 100000)
+
+		self.password_hash = f"{salt}:{h.hex()}"
+		self.portal_enabled = 1
+		self.must_change_password = 1
+		self.auth_token = None
+		self._log_system_activity("Portal access enabled" + (" — credentials emailed" if frappe.utils.sbool(send_email) else ""))
+		self.save(ignore_permissions=True)
+
+		if frappe.utils.sbool(send_email):
+			portal_url = "https://expertedge.ae/portal/login"
+			frappe.sendmail(
+				recipients=[self.email],
+				subject="ExpertEdge — Your Student Portal Access",
+				message=f"""
+				<p>Dear {self.student_name},</p>
+				<p>Your student portal account has been activated. Use the credentials below to sign in:</p>
+				<table style="border-collapse:collapse; margin:16px 0;">
+					<tr><td style="padding:6px 16px 6px 0; color:#666;">Portal</td><td style="padding:6px 0;"><a href="{portal_url}">{portal_url}</a></td></tr>
+					<tr><td style="padding:6px 16px 6px 0; color:#666;">Email</td><td style="padding:6px 0;"><strong>{self.email}</strong></td></tr>
+					<tr><td style="padding:6px 16px 6px 0; color:#666;">Password</td><td style="padding:6px 0;"><strong>{password}</strong></td></tr>
+				</table>
+				<p>You will be asked to change your password on first login.</p>
+				<p>If you have any questions, reply to this email or contact us at <a href="mailto:info@expertedge.ae">info@expertedge.ae</a>.</p>
+				<p>Best regards,<br>ExpertEdge Team</p>
+				""",
+				reference_doctype="EE Student",
+				reference_name=self.name,
+			)
+
+		return {"success": True, "password": password if not frappe.utils.sbool(send_email) else None}
+
+	@frappe.whitelist()
+	def reset_portal_password(self, send_email=True):
+		"""Reset portal password and optionally email new credentials."""
+		import hashlib
+		import secrets as _secrets
+
+		if not self.portal_enabled:
+			frappe.throw(_("Portal access is not enabled for this student"))
+		if not self.email:
+			frappe.throw(_("Student email is required"))
+
+		password = _secrets.token_urlsafe(8)
+		salt = _secrets.token_hex(16)
+		h = hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), 100000)
+
+		self.password_hash = f"{salt}:{h.hex()}"
+		self.must_change_password = 1
+		self.auth_token = None
+		self._log_system_activity("Portal password reset" + (" — new credentials emailed" if frappe.utils.sbool(send_email) else ""))
+		self.save(ignore_permissions=True)
+
+		if frappe.utils.sbool(send_email):
+			portal_url = "https://expertedge.ae/portal/login"
+			frappe.sendmail(
+				recipients=[self.email],
+				subject="ExpertEdge — Portal Password Reset",
+				message=f"""
+				<p>Dear {self.student_name},</p>
+				<p>Your portal password has been reset. Use the new credentials below:</p>
+				<table style="border-collapse:collapse; margin:16px 0;">
+					<tr><td style="padding:6px 16px 6px 0; color:#666;">Portal</td><td style="padding:6px 0;"><a href="{portal_url}">{portal_url}</a></td></tr>
+					<tr><td style="padding:6px 16px 6px 0; color:#666;">Email</td><td style="padding:6px 0;"><strong>{self.email}</strong></td></tr>
+					<tr><td style="padding:6px 16px 6px 0; color:#666;">New Password</td><td style="padding:6px 0;"><strong>{password}</strong></td></tr>
+				</table>
+				<p>You will be asked to change your password on first login.</p>
+				<p>— ExpertEdge Team</p>
+				""",
+				reference_doctype="EE Student",
+				reference_name=self.name,
+			)
+
+		return {"success": True}
+
+	@frappe.whitelist()
+	def disable_portal_access(self):
+		"""Disable portal access for this student."""
+		self.portal_enabled = 0
+		self.auth_token = None
+		self._log_system_activity("Portal access disabled")
+		self.save(ignore_permissions=True)
+		return {"success": True}
+
+	@frappe.whitelist()
 	def generate_web_form_link(self):
 		"""Enable web edit and return the shareable link."""
 		if not self.web_form_token:

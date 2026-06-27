@@ -87,6 +87,47 @@ frappe.ui.form.on("EE Student", {
 			}, __("Actions"));
 		}
 
+		// Portal Access
+		if (!frm.doc.portal_enabled) {
+			frm.add_custom_button(__("Enable Portal Access"), function () {
+				frappe.confirm(
+					__("This will generate a random password and email login credentials to <b>{0}</b>. Continue?", [frm.doc.email]),
+					function () {
+						frm.call("enable_portal_access", { send_email: 1 }).then((r) => {
+							if (r && r.message && r.message.success) {
+								frappe.show_alert({ message: __("Portal access enabled — credentials emailed"), indicator: "green" });
+								frm.reload_doc();
+							}
+						});
+					}
+				);
+			}, __("Portal"));
+		} else {
+			frm.add_custom_button(__("Reset Portal Password"), function () {
+				frappe.confirm(
+					__("Reset portal password and email new credentials to <b>{0}</b>?", [frm.doc.email]),
+					function () {
+						frm.call("reset_portal_password", { send_email: 1 }).then(() => {
+							frappe.show_alert({ message: __("Password reset — new credentials emailed"), indicator: "green" });
+							frm.reload_doc();
+						});
+					}
+				);
+			}, __("Portal"));
+
+			frm.add_custom_button(__("Disable Portal Access"), function () {
+				frappe.confirm(
+					__("Disable portal login for this student?"),
+					function () {
+						frm.call("disable_portal_access").then(() => {
+							frappe.show_alert({ message: __("Portal access disabled"), indicator: "orange" });
+							frm.reload_doc();
+						});
+					}
+				);
+			}, __("Portal"));
+		}
+
 		// Generate Web Form Link
 		frm.add_custom_button(__("Generate Web Form Link"), function () {
 			frm.call("generate_web_form_link").then((r) => {
