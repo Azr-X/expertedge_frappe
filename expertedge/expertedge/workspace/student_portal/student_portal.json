@@ -1,0 +1,232 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"h_portal\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h5\\\"><b>Student Portal Management</b></span>\",\"col\":12}},{\"id\":\"s_attendance_log\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Student Attendance\",\"col\":3}},{\"id\":\"s_materials\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Course Materials\",\"col\":3}},{\"id\":\"s_announcements\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Announcements\",\"col\":3}},{\"id\":\"s_schedule\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Schedule Entries\",\"col\":3}},{\"id\":\"s_events\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Events\",\"col\":3}},{\"id\":\"s_cpd\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"CPD Programs\",\"col\":3}},{\"id\":\"s_services\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Services\",\"col\":3}},{\"id\":\"s_students\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Portal Students\",\"col\":3}},{\"id\":\"sp1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"card_content\",\"type\":\"card\",\"data\":{\"card_name\":\"Portal Content\",\"col\":4}},{\"id\":\"card_attendance\",\"type\":\"card\",\"data\":{\"card_name\":\"Attendance & Schedule\",\"col\":4}},{\"id\":\"card_setup\",\"type\":\"card\",\"data\":{\"card_name\":\"Setup & Config\",\"col\":4}}]",
+ "creation": "2026-06-27 00:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "student",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Student Portal",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Portal Content",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "EE Announcement",
+   "link_count": 0,
+   "link_to": "EE Announcement",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "EE Event",
+   "link_count": 0,
+   "link_to": "EE Event",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "EE CPD Program",
+   "link_count": 0,
+   "link_to": "EE CPD Program",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "EE Service",
+   "link_count": 0,
+   "link_to": "EE Service",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Attendance & Schedule",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "EE Student Attendance",
+   "link_count": 0,
+   "link_to": "EE Student Attendance",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "EE Schedule Entry",
+   "link_count": 0,
+   "link_to": "EE Schedule Entry",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Setup & Config",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "EE Course Material",
+   "link_count": 0,
+   "link_to": "EE Course Material",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "EE Program",
+   "link_count": 0,
+   "link_to": "EE Program",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "EE Batch",
+   "link_count": 0,
+   "link_to": "EE Batch",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "ExpertEdge Settings",
+   "link_count": 0,
+   "link_to": "ExpertEdge Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-06-27 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "Student Portal",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "EE Manager"
+  },
+  {
+   "role": "EE Academic Counsellor"
+  }
+ ],
+ "sequence_id": 2.0,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "label": "Student Attendance",
+   "link_to": "EE Student Attendance",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Course Materials",
+   "link_to": "EE Course Material",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "label": "Announcements",
+   "link_to": "EE Announcement",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Cyan",
+   "doc_view": "List",
+   "label": "Schedule Entries",
+   "link_to": "EE Schedule Entry",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Purple",
+   "doc_view": "List",
+   "label": "Events",
+   "link_to": "EE Event",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Yellow",
+   "doc_view": "List",
+   "label": "CPD Programs",
+   "link_to": "EE CPD Program",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Services",
+   "link_to": "EE Service",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "label": "Portal Students",
+   "link_to": "EE Student",
+   "stats_filter": "[[\"EE Student\",\"portal_enabled\",\"=\",\"1\",false]]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Student Portal"
+}
