@@ -241,6 +241,7 @@ class EEStudent(Document):
 				message=message,
 				reference_doctype="EE Student",
 				reference_name=self.name,
+				now=True,
 			)
 
 		self._log_system_activity(label + (" emailed" if send_email else " marked sent manually"))
@@ -313,7 +314,7 @@ class EEStudent(Document):
 		self.save(ignore_permissions=True)
 
 		if frappe.utils.sbool(send_email):
-			portal_url = "https://expertedge.ae/portal/login"
+			portal_url = "https://expertedge.info/portal/login"
 			frappe.sendmail(
 				recipients=[self.email],
 				subject="ExpertEdge — Your Student Portal Access",
@@ -326,11 +327,12 @@ class EEStudent(Document):
 					<tr><td style="padding:6px 16px 6px 0; color:#666;">Password</td><td style="padding:6px 0;"><strong>{password}</strong></td></tr>
 				</table>
 				<p>You will be asked to change your password on first login.</p>
-				<p>If you have any questions, reply to this email or contact us at <a href="mailto:info@expertedge.ae">info@expertedge.ae</a>.</p>
+				<p>If you have any questions, reply to this email or contact us at <a href="mailto:info@expertedge.info">info@expertedge.info</a>.</p>
 				<p>Best regards,<br>ExpertEdge Team</p>
 				""",
 				reference_doctype="EE Student",
 				reference_name=self.name,
+				now=True,
 			)
 
 		return {"success": True, "password": password if not frappe.utils.sbool(send_email) else None}
@@ -357,7 +359,7 @@ class EEStudent(Document):
 		self.save(ignore_permissions=True)
 
 		if frappe.utils.sbool(send_email):
-			portal_url = "https://expertedge.ae/portal/login"
+			portal_url = "https://expertedge.info/portal/login"
 			frappe.sendmail(
 				recipients=[self.email],
 				subject="ExpertEdge — Portal Password Reset",
@@ -374,6 +376,7 @@ class EEStudent(Document):
 				""",
 				reference_doctype="EE Student",
 				reference_name=self.name,
+				now=True,
 			)
 
 		return {"success": True}
