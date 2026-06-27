@@ -191,7 +191,8 @@
    "fieldname": "batch",
    "fieldtype": "Link",
    "label": "Batch",
-   "options": "EE Batch"
+   "options": "EE Batch",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "lead",
@@ -492,7 +493,7 @@
   },
   {
    "fieldname": "password_hash",
-   "fieldtype": "Password",
+   "fieldtype": "Small Text",
    "label": "Portal Password Hash",
    "hidden": 1,
    "no_copy": 1
