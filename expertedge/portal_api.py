@@ -548,6 +548,83 @@ def get_schedule(token, from_date=None, to_date=None):
 	return {"schedule": entries}
 
 
+# ─── Site Content ────────────────────────────────────────────────────
+
+@frappe.whitelist(allow_guest=True)
+def get_page_content(page):
+	"""Get all content fields for a page. Public — no auth needed."""
+	entries = frappe.get_all(
+		"EE Site Content",
+		filters={"page": page},
+		fields=["content_key", "value"],
+	)
+	return {e.content_key: e.value for e in entries}
+
+
+@frappe.whitelist()
+def save_page_content(updates):
+	"""Save content fields. Admin only. updates = JSON array of {page, key, value}."""
+	frappe.only_for(["System Manager", "EE Manager"])
+	import json as _json
+
+	if isinstance(updates, str):
+		updates = _json.loads(updates)
+
+	saved = 0
+	for item in updates:
+		page = item.get("page")
+		key = item.get("key")
+		value = item.get("value", "")
+		if not page or not key:
+			continue
+
+		doc_name = f"{page}::{key}"
+		if frappe.db.exists("EE Site Content", doc_name):
+			frappe.db.set_value("EE Site Content", doc_name, "value", value)
+		else:
+			frappe.get_doc({
+				"doctype": "EE Site Content",
+				"page": page,
+				"content_key": key,
+				"value": value,
+			}).insert(ignore_permissions=True)
+		saved += 1
+
+	frappe.db.commit()
+	return {"success": True, "saved": saved}
+
+
+# ─── Blog ────────────────────────────────────────────────────────────
+
+@frappe.whitelist(allow_guest=True)
+def get_blog_posts(limit=20):
+	"""Get published blog posts. Public."""
+	posts = frappe.get_all(
+		"EE Blog Post",
+		filters={"is_published": 1},
+		fields=["name", "title", "slug", "excerpt", "author", "publish_date",
+				"cover_image", "tags"],
+		order_by="publish_date desc",
+		limit=int(limit),
+	)
+	return {"posts": posts}
+
+
+@frappe.whitelist(allow_guest=True)
+def get_blog_post(slug):
+	"""Get a single blog post by slug. Public."""
+	post = frappe.db.get_value(
+		"EE Blog Post",
+		{"slug": slug, "is_published": 1},
+		["name", "title", "slug", "excerpt", "body", "author", "publish_date",
+		 "cover_image", "tags", "meta_description"],
+		as_dict=True,
+	)
+	if not post:
+		frappe.throw(_("Blog post not found"), frappe.DoesNotExistError)
+	return {"post": post}
+
+
 # ─── Admin Helper — Set Portal Password ─────────────────────────────
 
 @frappe.whitelist()

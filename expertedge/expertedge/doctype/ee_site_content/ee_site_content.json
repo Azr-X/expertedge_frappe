@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "autoname": "format:{page}::{content_key}",
+ "creation": "2026-06-27 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "page",
+  "content_key",
+  "column_break_1",
+  "content_type",
+  "section_value",
+  "value"
+ ],
+ "fields": [
+  {
+   "fieldname": "page",
+   "fieldtype": "Data",
+   "label": "Page",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Page identifier (e.g. homepage, cma, about)"
+  },
+  {
+   "fieldname": "content_key",
+   "fieldtype": "Data",
+   "label": "Key",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "Content field key (e.g. hero_title, hero_desc)"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "content_type",
+   "fieldtype": "Select",
+   "label": "Content Type",
+   "options": "Text\nHTML\nJSON",
+   "default": "Text"
+  },
+  {
+   "fieldname": "section_value",
+   "fieldtype": "Section Break",
+   "label": "Content"
+  },
+  {
+   "fieldname": "value",
+   "fieldtype": "Long Text",
+   "label": "Value",
+   "reqd": 1,
+   "in_list_view": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-06-27 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "EE Site Content",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "role": "EE Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  }
+ ],
+ "sort_field": "page",
+ "sort_order": "ASC",
+ "states": [],
+ "track_changes": 1
+}
