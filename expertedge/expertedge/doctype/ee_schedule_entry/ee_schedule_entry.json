@@ -17,8 +17,9 @@
   "end_time",
   "venue",
   "section_details",
-  "course_material",
-  "description"
+  "description",
+  "section_materials",
+  "materials"
  ],
  "fields": [
   {
@@ -92,16 +93,21 @@
    "label": "Details"
   },
   {
-   "fieldname": "course_material",
-   "fieldtype": "Link",
-   "label": "Course Material",
-   "options": "EE Course Material",
-   "description": "Link to syllabus or assignment for this session"
-  },
-  {
    "fieldname": "description",
    "fieldtype": "Small Text",
    "label": "Notes"
+  },
+  {
+   "fieldname": "section_materials",
+   "fieldtype": "Section Break",
+   "label": "Course Materials"
+  },
+  {
+   "fieldname": "materials",
+   "fieldtype": "Table",
+   "label": "Materials",
+   "options": "EE Schedule Material",
+   "description": "Link syllabus, assignments, or reference materials for this session"
   }
  ],
  "links": [],

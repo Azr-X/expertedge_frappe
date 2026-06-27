@@ -545,10 +545,19 @@ def get_schedule(token, from_date=None, to_date=None):
 		"EE Schedule Entry",
 		filters=filters,
 		fields=["name", "title", "session_type", "date", "start_time",
-				"end_time", "venue", "instructor", "description", "course_material"],
+				"end_time", "venue", "instructor", "description"],
 		order_by="date asc, start_time asc",
 		limit=50,
 	)
+
+	# Attach materials from child table
+	for entry in entries:
+		entry["materials"] = frappe.get_all(
+			"EE Schedule Material",
+			filters={"parent": entry["name"]},
+			fields=["course_material", "material_title"],
+			order_by="idx asc",
+		)
 
 	return {"schedule": entries}
 

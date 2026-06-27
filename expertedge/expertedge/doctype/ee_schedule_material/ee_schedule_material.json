@@ -1,0 +1,39 @@
+{
+ "actions": [],
+ "creation": "2026-06-27 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "istable": 1,
+ "field_order": [
+  "course_material",
+  "material_title"
+ ],
+ "fields": [
+  {
+   "fieldname": "course_material",
+   "fieldtype": "Link",
+   "label": "Course Material",
+   "options": "EE Course Material",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "material_title",
+   "fieldtype": "Data",
+   "label": "Title",
+   "fetch_from": "course_material.title",
+   "read_only": 1,
+   "in_list_view": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-06-27 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "EE Schedule Material",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "ASC",
+ "states": []
+}
