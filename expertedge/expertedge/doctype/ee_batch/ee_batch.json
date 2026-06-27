@@ -31,7 +31,17 @@
   "pre_approval_fee",
   "section_break_brochure",
   "brochure_email_template",
-  "brochure"
+  "brochure",
+  "section_attendance",
+  "location_lat",
+  "location_lng",
+  "acceptable_range",
+  "column_break_attendance",
+  "timezone",
+  "start_time",
+  "break_time",
+  "end_time",
+  "check_in_cooldown_minutes"
  ],
  "fields": [
   {
@@ -190,6 +200,65 @@
    "fieldname": "brochure",
    "fieldtype": "Attach",
    "label": "Brochure Attachment"
+  },
+  {
+   "fieldname": "section_attendance",
+   "fieldtype": "Section Break",
+   "label": "Attendance & Geofence",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "location_lat",
+   "fieldtype": "Float",
+   "label": "Venue Latitude",
+   "precision": 8
+  },
+  {
+   "fieldname": "location_lng",
+   "fieldtype": "Float",
+   "label": "Venue Longitude",
+   "precision": 8
+  },
+  {
+   "fieldname": "acceptable_range",
+   "fieldtype": "Int",
+   "label": "Geofence Range (meters)",
+   "default": "200"
+  },
+  {
+   "fieldname": "column_break_attendance",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "timezone",
+   "fieldtype": "Select",
+   "label": "Timezone",
+   "options": "Asia/Dubai\nAsia/Kolkata\nAsia/Riyadh\nAsia/Qatar\nAsia/Bahrain\nAsia/Muscat\nAsia/Kuwait\nEurope/London\nAmerica/New_York",
+   "default": "Asia/Dubai"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Time",
+   "label": "Session Start Time",
+   "default": "09:00:00"
+  },
+  {
+   "fieldname": "break_time",
+   "fieldtype": "Time",
+   "label": "Break Time (Session Split)",
+   "default": "12:00:00"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Time",
+   "label": "Session End Time",
+   "default": "17:00:00"
+  },
+  {
+   "fieldname": "check_in_cooldown_minutes",
+   "fieldtype": "Int",
+   "label": "Check-in Cooldown (min)",
+   "default": "5"
   }
  ],
  "links": [],

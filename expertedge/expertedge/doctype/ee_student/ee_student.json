@@ -69,7 +69,13 @@
   "materials_issued_on",
   "section_web_form",
   "allow_web_edit",
-  "web_form_token"
+  "web_form_token",
+  "section_portal",
+  "portal_enabled",
+  "must_change_password",
+  "column_break_portal",
+  "password_hash",
+  "auth_token"
  ],
  "fields": [
   {
@@ -461,6 +467,44 @@
    "unique": 1,
    "no_copy": 1,
    "hidden": 1
+  },
+  {
+   "fieldname": "section_portal",
+   "fieldtype": "Section Break",
+   "label": "Portal Access",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "portal_enabled",
+   "fieldtype": "Check",
+   "label": "Portal Enabled",
+   "description": "Enable student portal login for this student"
+  },
+  {
+   "fieldname": "must_change_password",
+   "fieldtype": "Check",
+   "label": "Must Change Password",
+   "description": "Force password change on next login"
+  },
+  {
+   "fieldname": "column_break_portal",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "password_hash",
+   "fieldtype": "Password",
+   "label": "Portal Password Hash",
+   "hidden": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "auth_token",
+   "fieldtype": "Data",
+   "label": "Auth Token",
+   "hidden": 1,
+   "unique": 1,
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "links": [
