@@ -41,6 +41,12 @@
   "r2_signed_url_expiry",
   "section_brochure",
   "default_brochure",
+  "section_whatsapp",
+  "enable_whatsapp_alerts",
+  "whatsapp_api_key",
+  "column_break_whatsapp",
+  "whatsapp_template_id",
+  "whatsapp_recipients",
   "section_sla",
   "first_contact_sla_minutes",
   "doc_turnaround_sla_hours",
@@ -254,6 +260,41 @@
    "label": "Brochure Attachment"
   },
   {
+   "fieldname": "section_whatsapp",
+   "fieldtype": "Section Break",
+   "label": "WhatsApp Alerts (Zoko)"
+  },
+  {
+   "fieldname": "enable_whatsapp_alerts",
+   "fieldtype": "Check",
+   "label": "Enable WhatsApp Lead Alerts",
+   "default": "0"
+  },
+  {
+   "fieldname": "whatsapp_api_key",
+   "fieldtype": "Password",
+   "label": "Zoko API Key",
+   "depends_on": "enable_whatsapp_alerts"
+  },
+  {
+   "fieldname": "column_break_whatsapp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "whatsapp_template_id",
+   "fieldtype": "Data",
+   "label": "Template ID",
+   "default": "supportmessage_002",
+   "depends_on": "enable_whatsapp_alerts"
+  },
+  {
+   "fieldname": "whatsapp_recipients",
+   "fieldtype": "Table",
+   "label": "Alert Recipients",
+   "options": "EE WhatsApp Recipient",
+   "depends_on": "enable_whatsapp_alerts"
+  },
+  {
    "fieldname": "section_sla",
    "fieldtype": "Section Break",
    "label": "SLA / KPI Timers"
@@ -288,7 +329,7 @@
   }
  ],
  "links": [],
- "modified": "2026-06-02 12:00:00.000000",
+ "modified": "2026-06-16 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "ExpertEdge Settings",

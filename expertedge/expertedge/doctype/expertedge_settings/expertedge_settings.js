@@ -17,5 +17,21 @@ frappe.ui.form.on("ExpertEdge Settings", {
 				});
 			});
 		}
+
+		if (frm.doc.enable_whatsapp_alerts) {
+			frm.add_custom_button(__("Test WhatsApp Alert"), function () {
+				frappe.call({
+					method: "expertedge.whatsapp.test_whatsapp_alert",
+					freeze: true,
+					freeze_message: __("Sending test message..."),
+					callback: function () {
+						frappe.show_alert({
+							message: __("Test message sent"),
+							indicator: "green",
+						});
+					},
+				});
+			});
+		}
 	},
 });

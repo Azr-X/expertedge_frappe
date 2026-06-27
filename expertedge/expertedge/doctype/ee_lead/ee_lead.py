@@ -94,15 +94,21 @@ class EELead(Document):
 			row.user for row in (settings.email_recipients or [])
 			if row.email_type == "New Lead Notification"
 		]
-		if not recipients:
-			return
-		for user in recipients:
-			frappe.publish_realtime(
-				"msgprint",
-				{"message": f"New lead {self.lead_name} — call within {sla_minutes} min", "alert": True},
-				user=user,
-			)
-		self._email_telecaller_new_lead(settings, recipients, sla_minutes)
+		if recipients:
+			for user in recipients:
+				frappe.publish_realtime(
+					"msgprint",
+					{"message": f"New lead {self.lead_name} — call within {sla_minutes} min", "alert": True},
+					user=user,
+				)
+			self._email_telecaller_new_lead(settings, recipients, sla_minutes)
+
+		# WhatsApp alert
+		from expertedge.whatsapp import send_lead_alert
+		try:
+			send_lead_alert(self)
+		except Exception:
+			frappe.log_error("WhatsApp lead alert failed", "WhatsApp Alert")
 
 	def _email_telecaller_new_lead(self, settings, recipients, sla_minutes):
 		"""Send email to configured recipients about new lead."""
