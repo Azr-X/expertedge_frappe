@@ -38,6 +38,21 @@ frappe.pages["student-attendance"].on_page_load = function (wrapper) {
 			label: "Batch",
 			options: "EE Batch",
 			reqd: 1,
+			change: function () {
+				var batch = batch_ctrl.get_value();
+				if (!batch) return;
+				frappe.db.get_value("EE Batch", batch, ["start_date", "end_date"]).then(function (r) {
+					if (r.message) {
+						if (r.message.start_date) from_ctrl.set_value(r.message.start_date);
+						if (r.message.end_date) {
+							// Cap to today if end_date is in the future
+							var end = r.message.end_date;
+							var today = frappe.datetime.get_today();
+							to_ctrl.set_value(end > today ? today : end);
+						}
+					}
+				});
+			},
 		},
 		parent: page.main.find("#batch-filter"),
 		render_input: true,
