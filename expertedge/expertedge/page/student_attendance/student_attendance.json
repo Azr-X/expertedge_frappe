@@ -1,0 +1,26 @@
+{
+ "content": null,
+ "creation": "2026-07-04 13:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Page",
+ "modified": "2026-07-04 13:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Expertedge",
+ "name": "student-attendance",
+ "owner": "Administrator",
+ "page_name": "student-attendance",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "EE Manager"
+  },
+  {
+   "role": "EE Academic Counsellor"
+  }
+ ],
+ "standard": "Yes",
+ "system_page": 0,
+ "title": "Student Attendance"
+}

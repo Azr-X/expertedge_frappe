@@ -1,0 +1,86 @@
+.student-attendance-page {
+	padding: 15px;
+}
+
+.heatmap-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+.heatmap-table th,
+.heatmap-table td {
+	border: 1px solid var(--border-color);
+	text-align: center;
+	padding: 0;
+}
+
+.heatmap-table th {
+	background: var(--bg-color);
+	padding: 6px 4px;
+	font-weight: 600;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+}
+
+.heatmap-table th.student-name-col {
+	text-align: left;
+	min-width: 180px;
+	padding-left: 10px;
+}
+
+.heatmap-table td.student-name-cell {
+	text-align: left;
+	padding: 4px 10px;
+	font-weight: 500;
+	white-space: nowrap;
+	position: sticky;
+	left: 0;
+	background: var(--card-bg);
+	z-index: 0;
+}
+
+.heatmap-table .date-header {
+	font-size: 11px;
+	line-height: 1.2;
+}
+
+.heatmap-table .date-header .day-name {
+	font-size: 10px;
+	color: var(--text-muted);
+}
+
+.att-cell {
+	width: 22px;
+	height: 28px;
+	display: inline-block;
+	margin: 2px 1px;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+.att-cell.present {
+	background-color: var(--green-500, #28a745);
+}
+
+.att-cell.absent {
+	background-color: var(--red-500, #dc3545);
+}
+
+.att-cell.no-class {
+	background-color: var(--gray-300, #dee2e6);
+}
+
+.session-pair {
+	display: flex;
+	justify-content: center;
+	gap: 2px;
+	padding: 3px 0;
+}
+
+.heatmap-wrapper {
+	overflow-x: auto;
+	max-height: 75vh;
+	overflow-y: auto;
+}
