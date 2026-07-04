@@ -43,17 +43,21 @@ frappe.pages["student-attendance"].on_page_load = function (wrapper) {
 		render_input: true,
 	});
 
-	page.main.find("#btn-refresh").on("click", function () {
+	function do_refresh() {
 		render_heatmap(
 			from_ctrl.get_value(),
 			to_ctrl.get_value(),
 			batch_ctrl.get_value(),
+			page.main.find("#chk-absent-only").is(":checked"),
 			page
 		);
-	});
+	}
+
+	page.main.find("#btn-refresh").on("click", do_refresh);
+	page.main.find("#chk-absent-only").on("change", do_refresh);
 };
 
-function render_heatmap(from_date, to_date, batch, page) {
+function render_heatmap(from_date, to_date, batch, absent_only, page) {
 	if (!from_date || !to_date || !batch) {
 		frappe.show_alert({ message: __("Please select all filters"), indicator: "orange" });
 		return;
@@ -73,13 +77,46 @@ function render_heatmap(from_date, to_date, batch, page) {
 		var dates = get_date_range(from_date, to_date);
 		var day_names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+		// Compute total sessions (class dates only)
+		var total_sessions = data.total_sessions || 0;
+
+		// Pre-compute per-student stats
+		var student_stats = data.students.map(function (student) {
+			var attended = 0;
+			var missed = 0;
+			dates.forEach(function (d) {
+				["First Half", "Second Half"].forEach(function (session) {
+					var key = student.name + "|" + d + "|" + session;
+					var status = data.attendance[key];
+					if (status === "present") attended++;
+					else if (status === "absent") missed++;
+				});
+			});
+			return {
+				student: student,
+				attended: attended,
+				missed: missed,
+				pct: total_sessions > 0 ? Math.round((attended / total_sessions) * 100) : 0,
+			};
+		});
+
+		// Filter if absent_only
+		var filtered = absent_only
+			? student_stats.filter(function (s) { return s.missed > 0; })
+			: student_stats;
+
+		if (!filtered.length) {
+			container.html('<p class="text-muted">No students to display.</p>');
+			return;
+		}
+
 		// Build header
 		var html = '<div class="heatmap-wrapper"><table class="heatmap-table"><thead><tr>';
 		html += '<th class="student-name-col">Student</th>';
+		html += '<th>Attendance %</th>';
 		dates.forEach(function (d) {
 			var dt = new Date(d);
 			var day = day_names[dt.getDay()];
-			var label = frappe.datetime.str_to_user(d).replace(/^\d{4}-/, "");
 			html +=
 				'<th><div class="date-header"><div class="day-name">' +
 				day +
@@ -90,12 +127,21 @@ function render_heatmap(from_date, to_date, batch, page) {
 		html += "</tr></thead><tbody>";
 
 		// Build rows
-		data.students.forEach(function (student) {
+		filtered.forEach(function (row) {
+			var student = row.student;
+			var pct_cls = row.pct >= 75 ? "green" : row.pct >= 50 ? "orange" : "red";
+
 			html += "<tr>";
 			html +=
 				'<td class="student-name-cell">' +
 				frappe.utils.escape_html(student.student_name) +
 				"</td>";
+
+			html +=
+				'<td style="white-space:nowrap;font-weight:600;text-align:center">' +
+				'<span class="indicator-pill ' + pct_cls + '">' +
+				row.attended + "/" + total_sessions +
+				" (" + row.pct + "%)</span></td>";
 
 			dates.forEach(function (d) {
 				var key = student.name + "|" + d;

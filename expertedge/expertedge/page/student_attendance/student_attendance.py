@@ -46,4 +46,4 @@ def get_attendance_data(from_date, to_date, batch):
 			if key not in attendance:
 				attendance[key] = "absent"
 
-	return {"students": students, "attendance": attendance}
+	return {"students": students, "attendance": attendance, "total_sessions": len(class_dates)}
