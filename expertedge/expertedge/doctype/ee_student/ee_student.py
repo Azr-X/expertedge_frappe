@@ -12,6 +12,8 @@ class EEStudent(Document):
 			self.web_form_token = str(uuid.uuid4())[:12]
 
 	def validate(self):
+		if self.email:
+			self.email = self.email.strip().lower()
 		self._auto_disable_web_edit()
 		self._guard_status()
 		self._resolve_fees()
