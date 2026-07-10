@@ -115,7 +115,40 @@ frappe.ui.form.on("EE Student", {
 				);
 			}, __("Portal"));
 
-			frm.add_custom_button(__("Disable Portal Access"), function () {
+			frm.add_custom_button(__("Set Password"), function () {
+			var d = new frappe.ui.Dialog({
+				title: __("Set Portal Password"),
+				fields: [
+					{
+						fieldname: "password",
+						fieldtype: "Password",
+						label: "New Password",
+						reqd: 1,
+						description: "Minimum 6 characters. No email will be sent.",
+					},
+				],
+				primary_action_label: __("Set"),
+				primary_action: function (values) {
+					d.hide();
+					frappe.call({
+						method: "expertedge.portal_api.set_portal_password",
+						args: {
+							student_name: frm.doc.name,
+							password: values.password,
+						},
+						callback: function (r) {
+							if (r.message && r.message.success) {
+								frappe.show_alert({ message: __("Password set successfully"), indicator: "green" });
+								frm.reload_doc();
+							}
+						},
+					});
+				},
+			});
+			d.show();
+		}, __("Portal"));
+
+		frm.add_custom_button(__("Disable Portal Access"), function () {
 				frappe.confirm(
 					__("Disable portal login for this student?"),
 					function () {
