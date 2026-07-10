@@ -5,7 +5,7 @@ from frappe.utils import flt
 def execute(filters=None):
 	filters = filters or {}
 	columns = [
-		{"fieldname": "lead_source", "label": "Lead Source", "fieldtype": "Link", "options": "EE Lead Source", "width": 200},
+		{"fieldname": "lead_source", "label": "Lead Source", "fieldtype": "Data", "width": 200},
 		{"fieldname": "total_leads", "label": "Total Leads", "fieldtype": "Int", "width": 130},
 		{"fieldname": "total_students", "label": "Total Students", "fieldtype": "Int", "width": 140},
 		{"fieldname": "effectiveness", "label": "Effectiveness %", "fieldtype": "Percent", "width": 140},
@@ -38,6 +38,14 @@ def execute(filters=None):
 	""".format(student_conditions=student_conditions), filters, as_dict=True)
 
 	student_map = {r.lead_source: r.total_students for r in student_counts}
+
+	# Count students without a lead link
+	direct = frappe.db.sql("""
+		SELECT COUNT(*) as cnt FROM `tabEE Student` s
+		WHERE (s.lead IS NULL OR s.lead = '') {student_conditions}
+	""".format(student_conditions=student_conditions), filters)[0][0]
+	if direct:
+		student_map["Direct (No Lead)"] = direct
 
 	all_sources = set(lead_map.keys()) | set(student_map.keys())
 	data = []
