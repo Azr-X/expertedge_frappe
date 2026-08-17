@@ -16,6 +16,7 @@ from frappe.utils import now_datetime, nowdate, get_datetime, cint, cstr, flt, t
 
 from expertedge.expertedge.doctype.ee_assignment_submission.ee_assignment_submission import (
 	get_required_count,
+	get_slot_count,
 )
 
 
@@ -422,10 +423,11 @@ MAX_SUBMISSION_SIZE = 10 * 1024 * 1024  # 10 MB
 
 @frappe.whitelist(allow_guest=True)
 def get_assignments(token):
-	"""Assignment requirement + submission state for the logged-in student."""
+	"""Assignment slots + submission state for the logged-in student."""
 	student = _get_student_by_token(token)
 
 	required = get_required_count(student.name)
+	slot_count = get_slot_count(student.name)
 
 	submissions = frappe.get_all(
 		"EE Assignment Submission",
@@ -437,7 +439,7 @@ def get_assignments(token):
 	by_sequence = {cint(s.sequence): s for s in submissions}
 
 	slots = []
-	for seq in range(1, required + 1):
+	for seq in range(1, slot_count + 1):
 		sub = by_sequence.get(seq)
 		slots.append({
 			"sequence": seq,
@@ -447,11 +449,12 @@ def get_assignments(token):
 
 	return {
 		"required": required,
+		"slot_count": slot_count,
 		"submitted": len([s for s in submissions if s.status in ("Submitted", "Under Review", "Accepted")]),
 		"accepted": len([s for s in submissions if s.status == "Accepted"]),
 		"status": student.assignments_status or ("Not Required" if not required else "Pending"),
 		"slots": slots,
-		"extra": [by_sequence[k] for k in sorted(by_sequence) if k > required],
+		"extra": [by_sequence[k] for k in sorted(by_sequence) if k > slot_count],
 	}
 
 
@@ -466,11 +469,9 @@ def submit_assignment(token, sequence, filename, filedata, assignment=None):
 	student = _get_student_by_token(token)
 	sequence = cint(sequence)
 
-	required = get_required_count(student.name)
-	if required <= 0:
-		frappe.throw(_("No assignment submission is required for you."))
-	if sequence < 1 or sequence > required:
-		frappe.throw(_("Invalid assignment number. You are required to submit {0} assignment(s).").format(required))
+	slot_count = get_slot_count(student.name)
+	if sequence < 1 or sequence > slot_count:
+		frappe.throw(_("Invalid assignment number. {0} slot(s) are available.").format(slot_count))
 
 	filename = cstr(filename).strip()
 	if not filename:

@@ -7,13 +7,18 @@ from frappe.utils import cint, now_datetime
 # Statuses that count as "the student has handed something in"
 SUBMITTED_STATUSES = ("Submitted", "Under Review", "Accepted")
 
+# Slots always offered in the portal, even when nothing is formally required.
+# Whether a student needs to submit depends on their experience, so the call is
+# left to them — the portal shows the slots and they upload if applicable.
+DEFAULT_ASSIGNMENT_SLOTS = 2
+
 
 class EEAssignmentSubmission(Document):
 	def validate(self):
 		if cint(self.sequence) < 1:
 			frappe.throw(_("Assignment No. must be 1 or greater"))
 
-		self.validate_required_count()
+		self.validate_slot()
 		self.validate_duplicate()
 
 		if not self.submitted_on:
@@ -23,16 +28,12 @@ class EEAssignmentSubmission(Document):
 			self.reviewed_by = frappe.session.user
 			self.reviewed_on = now_datetime()
 
-	def validate_required_count(self):
-		required = get_required_count(self.student)
-		if required <= 0:
+	def validate_slot(self):
+		slots = get_slot_count(self.student)
+		if cint(self.sequence) > slots:
 			frappe.throw(
-				_("{0} is not required to submit any assignments.").format(self.student)
-			)
-		if cint(self.sequence) > required:
-			frappe.throw(
-				_("Assignment No. {0} exceeds the {1} assignment(s) required for this student.").format(
-					self.sequence, required
+				_("Assignment No. {0} exceeds the {1} assignment slot(s) available for this student.").format(
+					self.sequence, slots
 				)
 			)
 
@@ -63,8 +64,19 @@ class EEAssignmentSubmission(Document):
 		update_student_progress(getattr(self, "_student_to_refresh", None) or self.student)
 
 
+def get_slot_count(student):
+	"""How many upload slots the portal offers this student.
+
+	Never fewer than the default — the requirement depends on the student's
+	experience, so the slots are always visible and submitting is their call.
+	"""
+	return max(get_required_count(student), DEFAULT_ASSIGNMENT_SLOTS)
+
+
 def get_required_count(student):
-	"""How many assignments this student must submit.
+	"""How many assignments this student is formally expected to submit.
+
+	Used for reporting and progress display only; it does not block uploads.
 
 	The batch default applies unless the student carries an explicit override
 	(override_assignments_required = 1), which may legitimately be 0 for students
