@@ -75,7 +75,14 @@
   "must_change_password",
   "column_break_portal",
   "password_hash",
-  "auth_token"
+  "auth_token",
+  "section_assignments",
+  "override_assignments_required",
+  "assignments_required",
+  "assignments_status",
+  "column_break_assignments",
+  "assignments_submitted",
+  "assignments_accepted"
  ],
  "fields": [
   {
@@ -506,6 +513,53 @@
    "unique": 1,
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "section_assignments",
+   "fieldtype": "Section Break",
+   "label": "Assignments",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "override_assignments_required",
+   "fieldtype": "Check",
+   "label": "Override Batch Requirement",
+   "default": "0",
+   "description": "Tick to set a student-specific number of required assignments (including 0 for an exempt student)"
+  },
+  {
+   "fieldname": "assignments_required",
+   "fieldtype": "Int",
+   "label": "Assignments Required",
+   "depends_on": "override_assignments_required",
+   "description": "Overrides the batch value when the override is ticked"
+  },
+  {
+   "fieldname": "assignments_status",
+   "fieldtype": "Select",
+   "label": "Assignment Status",
+   "options": "\nNot Required\nPending\nComplete",
+   "read_only": 1,
+   "no_copy": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "column_break_assignments",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "assignments_submitted",
+   "fieldtype": "Int",
+   "label": "Assignments Submitted",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "assignments_accepted",
+   "fieldtype": "Int",
+   "label": "Assignments Accepted",
+   "read_only": 1,
+   "no_copy": 1
   }
  ],
  "links": [
@@ -513,9 +567,14 @@
    "group": "Payments",
    "link_doctype": "EE Nomod Payment Link",
    "link_fieldname": "student"
+  },
+  {
+   "group": "Academics",
+   "link_doctype": "EE Assignment Submission",
+   "link_fieldname": "student"
   }
  ],
- "modified": "2026-06-03 10:00:00.000000",
+ "modified": "2026-08-17 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Expertedge",
  "name": "EE Student",

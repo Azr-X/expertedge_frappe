@@ -12,7 +12,11 @@ import secrets
 
 import frappe
 from frappe import _
-from frappe.utils import now_datetime, nowdate, get_datetime, cstr, flt, today
+from frappe.utils import now_datetime, nowdate, get_datetime, cint, cstr, flt, today
+
+from expertedge.expertedge.doctype.ee_assignment_submission.ee_assignment_submission import (
+	get_required_count,
+)
 
 
 # ─── Password Helpers ───────────────────────────────────────────────
@@ -408,6 +412,160 @@ def get_material_file(token, material_name, file_type="pdf"):
 		return {"url": material.answer_pdf}
 
 	return {"url": material.pdf_file}
+
+
+# ─── Assignment Submissions ─────────────────────────────────────────
+
+ALLOWED_SUBMISSION_EXTENSIONS = ("pdf", "doc", "docx", "xls", "xlsx", "jpg", "jpeg", "png", "zip")
+MAX_SUBMISSION_SIZE = 10 * 1024 * 1024  # 10 MB
+
+
+@frappe.whitelist(allow_guest=True)
+def get_assignments(token):
+	"""Assignment requirement + submission state for the logged-in student."""
+	student = _get_student_by_token(token)
+
+	required = get_required_count(student.name)
+
+	submissions = frappe.get_all(
+		"EE Assignment Submission",
+		filters={"student": student.name},
+		fields=["name", "sequence", "attempt", "status", "file_name", "attachment",
+				"submitted_on", "marks", "max_marks", "feedback", "assignment"],
+		order_by="sequence asc",
+	)
+	by_sequence = {cint(s.sequence): s for s in submissions}
+
+	slots = []
+	for seq in range(1, required + 1):
+		sub = by_sequence.get(seq)
+		slots.append({
+			"sequence": seq,
+			"submission": sub,
+			"can_submit": (not sub) or sub.status == "Resubmit Required",
+		})
+
+	return {
+		"required": required,
+		"submitted": len([s for s in submissions if s.status in ("Submitted", "Under Review", "Accepted")]),
+		"accepted": len([s for s in submissions if s.status == "Accepted"]),
+		"status": student.assignments_status or ("Not Required" if not required else "Pending"),
+		"slots": slots,
+		"extra": [by_sequence[k] for k in sorted(by_sequence) if k > required],
+	}
+
+
+@frappe.whitelist(allow_guest=True)
+def submit_assignment(token, sequence, filename, filedata, assignment=None):
+	"""Upload a student's assignment file for the given slot.
+
+	filedata is a base64-encoded string (data-URI prefix tolerated).
+	"""
+	import base64
+
+	student = _get_student_by_token(token)
+	sequence = cint(sequence)
+
+	required = get_required_count(student.name)
+	if required <= 0:
+		frappe.throw(_("No assignment submission is required for you."))
+	if sequence < 1 or sequence > required:
+		frappe.throw(_("Invalid assignment number. You are required to submit {0} assignment(s).").format(required))
+
+	filename = cstr(filename).strip()
+	if not filename:
+		frappe.throw(_("File name is required"))
+	extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+	if extension not in ALLOWED_SUBMISSION_EXTENSIONS:
+		frappe.throw(_("File type .{0} is not allowed. Allowed: {1}").format(
+			extension or "?", ", ".join(ALLOWED_SUBMISSION_EXTENSIONS)))
+
+	if not filedata:
+		frappe.throw(_("File content is required"))
+	if "," in filedata[:100] and filedata[:5] == "data:":
+		filedata = filedata.split(",", 1)[1]
+	try:
+		content = base64.b64decode(filedata)
+	except Exception:
+		frappe.throw(_("Could not read the uploaded file"))
+	if len(content) > MAX_SUBMISSION_SIZE:
+		frappe.throw(_("File is too large. Maximum size is 10 MB."))
+
+	existing = frappe.db.get_value(
+		"EE Assignment Submission",
+		{"student": student.name, "sequence": sequence},
+		["name", "status"],
+		as_dict=True,
+	)
+	if existing and existing.status in ("Accepted", "Under Review"):
+		frappe.throw(_("Assignment {0} is already {1} and cannot be replaced.").format(
+			sequence, existing.status.lower()))
+
+	# Validate the linked assignment belongs to the student's program/batch
+	if assignment:
+		mat = frappe.db.get_value(
+			"EE Course Material", assignment,
+			["program", "batch", "category", "is_published"], as_dict=True,
+		)
+		if (not mat) or mat.category != "Assignment" or not mat.is_published:
+			frappe.throw(_("Invalid assignment"))
+		if mat.program != student.program or (mat.batch and mat.batch != student.batch):
+			frappe.throw(_("Access denied"))
+
+	file_doc = frappe.get_doc({
+		"doctype": "File",
+		"file_name": f"{student.name}-A{sequence}-{filename}",
+		"is_private": 1,
+		"content": content,
+	}).insert(ignore_permissions=True)
+
+	if existing:
+		doc = frappe.get_doc("EE Assignment Submission", existing.name)
+		doc.attempt = cint(doc.attempt) + 1
+	else:
+		doc = frappe.new_doc("EE Assignment Submission")
+		doc.student = student.name
+		doc.sequence = sequence
+		doc.attempt = 1
+
+	doc.assignment = assignment or doc.assignment
+	doc.attachment = file_doc.file_url
+	doc.file_name = filename
+	doc.submitted_on = now_datetime()
+	doc.submitted_via = "Portal"
+	doc.status = "Submitted"
+	doc.save(ignore_permissions=True)
+
+	# Link the file to the submission for cleanup + permission checks
+	frappe.db.set_value("File", file_doc.name, {
+		"attached_to_doctype": "EE Assignment Submission",
+		"attached_to_name": doc.name,
+		"attached_to_field": "attachment",
+	}, update_modified=False)
+
+	frappe.db.commit()
+
+	return {
+		"success": True,
+		"name": doc.name,
+		"sequence": sequence,
+		"attempt": doc.attempt,
+		"status": doc.status,
+		"file_name": doc.file_name,
+		"submitted_on": doc.submitted_on,
+	}
+
+
+@frappe.whitelist(allow_guest=True)
+def get_submission_file(token, submission_name):
+	"""Return the file URL of the student's own submission."""
+	student = _get_student_by_token(token)
+
+	owner = frappe.db.get_value("EE Assignment Submission", submission_name, "student")
+	if owner != student.name:
+		frappe.throw(_("Access denied"))
+
+	return {"url": frappe.db.get_value("EE Assignment Submission", submission_name, "attachment")}
 
 
 # ─── Announcements ───────────────────────────────────────────────────
